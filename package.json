@@ -1,0 +1,34 @@
+{
+  "private": true,
+  "name": "@phorbas/thoughtscape",
+  "version": "0.0.0",
+  "description": "Self-hosting pasture for thoughts: notes, collections, articles, snippets, and more.",
+  "license": "BSD-2-Clause",
+  "author": "Shane Holloway <shane.holloway@ieee.org>",
+  "homepage": "https://github.com/phorbas/thoughtscape#readme",
+  "bugs": {
+    "url": "https://github.com/phorbas/thoughtscape/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/phorbas/thoughtscape.git"
+  },
+  "files": [
+    "code/",
+    "esm/"
+  ],
+  "type": "module",
+  "exports": {},
+  "devDependencies": {
+    "imm-dom": "^0.3.10",
+    "rollup-plugin-jsy": "^1.9.2",
+    "vite": "^6.1.0"
+  },
+  "scripts": {
+    "vite": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test"
+  }
+}

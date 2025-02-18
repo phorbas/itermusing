@@ -28,8 +28,16 @@ export async function _mock_init_store(stg) ::
 
   let [,hk1_md_view] = as_hex_pair @ await stg.store_utf8 @ `\
     import "https://md-block.verou.me/md-block.js"
-    console.log @ "Registered md-block!"
+    console.log("Registered md-block!")
+
+    export const view_for = async (content, {h}) =>
+      h.md_block('' + await content.text() )
     `
+  if 0 ::
+    console.log @ "MOCK", @{} hk1_md_view
+
+    let rt_md_view = await stg.fetch_utf8 @ hex_to_u8 @ hk1_md_view
+    console.log @ "MOCK", @{} rt_md_view
 
   return stg
 

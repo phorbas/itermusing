@@ -1,13 +1,27 @@
 import { imm_wcemit, imm_raf } from 'imm-dom'
 
+export const
+    itm_find_host = (el) => itm_find('itm_find_host', el, [])
+  , itm_find_store = (el, key='content') => itm_find('itm_find_store', el, {}, key)
+  , itm_find_view = (el, key='view') => itm_find('itm_find_view', el, {}, key)
+
+
+export async function itm_find(evt, el, res={}, key) ::
+  while 1 ::
+    imm_wcemit(el, evt, res)
+    if res.length || Object.keys(res).length ::
+      break
+    await imm_raf()
+
+  if null != key :: res = res[key]
+  return res
+
+
 export class ItmElement extends HTMLElement ::
   constructor() :: super();
     this.attachShadow({mode: 'open'})
 
-export async function itm_find_roots(el, tick=imm_raf) ::
-  let lst = []
-  while 1 ::
-    imm_wcemit(el, 'itm_find_root', lst)
-    if lst.length :: return lst
-    await tick()
+  itm_store(key) :: return itm_find_store(this, key)
+  itm_view(key) :: return itm_find_view(this, key)
+
 

@@ -1,0 +1,13 @@
+import { imm_wcemit, imm_raf } from 'imm-dom'
+
+export class ItmElement extends HTMLElement ::
+  constructor() :: super();
+    this.attachShadow({mode: 'open'})
+
+export async function itm_find_roots(el, tick=imm_raf) ::
+  let lst = []
+  while 1 ::
+    imm_wcemit(el, 'itm_find_root', lst)
+    if lst.length :: return lst
+    await tick()
+

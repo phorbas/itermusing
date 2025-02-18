@@ -1,4 +1,4 @@
-# Thoughtscape
+# Itermusing
 
 Since 2001, Brian and I have been dreaming, thinking, designing, building,
 avoiding, and otherwise circling the topic of how to pragmatically collect
@@ -18,9 +18,23 @@ diagrams, and code sketches. During the global COVID Pandemic of 2020, I
 was able to focus some of my free time into creating several supporting
 Open Source libraries including PHORBAS Opaque, Store, and HAMT, among
 others.  Pursuing our concept once again, we are starting work under the
-PHORBAS project with the name "Thoughtscape", giving a digital place of
-pasture to think.
+PHORBAS project with the name "Itermusing", giving a digital place of
+pasture for the paths your musings lead you down.
 
+## Get Started
+
+```sh
+npm ci
+
+# Continuously build ./esm library (using one console window)
+npm run watch
+
+# Run development website (using another console window)
+npm run vite
+
+# Build the ./esm library and the ./dist website
+npm run build
+```
 
 ## Inspirations
 - Self-hosted nature of

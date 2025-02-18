@@ -1,0 +1,21 @@
+import { itm_sym } from './itm_symbol.jsy'
+import { _with_itermusing_root } from './itm_root.jsy'
+import { ItermusingStore } from './itm_store.jsy'
+import { ItermusingViews } from './itm_views.jsy'
+import { ITMContent } from './itm_content.jsy'
+
+const import_opt = new URL(import.meta.url).searchParams
+
+if import_opt.has('register') ::
+  customElements.define @ 'iter-musing', _with_itermusing_root()
+  customElements.define @ 'iter-musing-body',
+    _with_itermusing_root(HTMLBodyElement)
+    { extends: 'body' }
+
+  customElements.define @ 'iter-musing-store', ItermusingStore
+  customElements.define @ 'iter-musing-views', ItermusingViews
+
+  customElements.define @ 'itm-c', ITMContent
+
+export @{}
+  itm_sym

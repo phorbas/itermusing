@@ -1,24 +1,32 @@
-import rpi_jsy from 'rollup-plugin-jsy'
+import {_rpis_, default as rollupOptions} from './rollup.config.js'
+
+const entrypoints = [
+  './index.html',
+  './sw.js',
+]
 
 export default {
-  plugins: [
-    rpi_jsy(),
-  ],
-
+  appType: 'mpa',
   define: {
   },
 
+  plugins: _rpis_(),
   build: {
+    rollupOptions: {
+      input: entrypoints,
+      plugins: _rpis_(),
+    },
     target: 'esnext',
     modulePreload: {
       polyfill: false,
     },
-    lib: {
-      fileName: (format, entryName) => `esm/${entryName}.js`,
-      formats: ['es'],
-      entry: [
-        './index.html'
-      ],
+    watch: {
+      buildDelay: 100,
     }
-  }
+  },
+
+  worker: {
+    format: 'es',
+    plugins: _rpis_,
+  },
 }

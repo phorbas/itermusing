@@ -1,0 +1,38 @@
+import { imm_wcemit } from 'imm-dom'
+
+import { opaque_basic } from '@phorbas/opaque/esm/web/index.mjs'
+import { phorbas_store, hex_to_u8 } from '@phorbas/store'
+import { bkc_with_js_map } from '@phorbas/store'
+//import bkc_with_web_db from '@phorbas/store/esm/web/web_db.mjs'
+//import bkc_with_web_cache from '@phorbas/store/esm/web/web_cache.mjs'
+
+import { ItmElement } from './itm_utils.jsy'
+import {_mock_init_store} from './_mock_data.jsy'
+
+
+export class ITMStore ::
+  constructor(_stg_) :: this._stg_ = _stg_
+  as_itm_store() :: return this
+
+  async content_for_key(key, mime) ::
+    let bk = hex_to_u8(key)
+    let res = await this._stg_.fetch_content(bk)
+    console.log @: key, mime, res
+    return res ? new Blob([res], {type:mime}) : res
+
+
+
+export class ItermusingStore extends ItmElement ::
+  async connectedCallback() ::
+    let stg = await phorbas_store @
+      bkc_with_js_map(), @{} opaque: opaque_basic
+
+    await _mock_init_store(stg)
+
+    this.store = new ITMStore(stg)
+    let evt_res = imm_wcemit @ this, 'itm_storage', this.store
+
+  disconnectedCallback() ::
+    this._unsub_host?.()
+
+

@@ -1,34 +1,49 @@
 {
   "private": true,
-  "name": "@phorbas/thoughtscape",
+  "name": "@phorbas/itermusing",
   "version": "0.0.0",
-  "description": "Self-hosting pasture for thoughts: notes, collections, articles, snippets, and more.",
+  "description": "Self-hosting pasture for your musing paths: notes, collections, articles, snippets, and more.",
   "license": "BSD-2-Clause",
   "author": "Shane Holloway <shane.holloway@ieee.org>",
-  "homepage": "https://github.com/phorbas/thoughtscape#readme",
+  "homepage": "https://github.com/phorbas/itermusing#readme",
   "bugs": {
-    "url": "https://github.com/phorbas/thoughtscape/issues"
+    "url": "https://github.com/phorbas/itermusing/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/phorbas/thoughtscape.git"
+    "url": "git+ssh://git@github.com/phorbas/itermusing.git"
   },
   "files": [
-    "code/",
-    "esm/"
+    "esm/",
+    "dist/"
   ],
   "type": "module",
-  "exports": {},
+  "exports": {
+    ".": "./esm/itermusing.js",
+    "./esm": "./esm"
+  },
   "devDependencies": {
+    "@phorbas/hamt": "file:../hamt",
+    "@phorbas/opaque": "file:../opaque",
+    "@phorbas/store": "file:../store",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "hono": "^4.7.1",
     "imm-dom": "^0.3.10",
+    "rollup": "^4.34.6",
+    "rollup-plugin-dgnotify": "^0.1.8",
     "rollup-plugin-jsy": "^1.9.2",
     "vite": "^6.1.0"
   },
   "scripts": {
+    "clean": "rm -rf ./dist ./esm",
+    "dgnotify": "rollup-plugin-dgnotify",
+    "previte": "npm -s run build:esm",
     "vite": "vite",
-    "dev": "vite",
-    "build": "vite build",
+    "prepreview": "npm -s run build:esm",
     "preview": "vite preview",
-    "test": "node --test"
+    "build:esm": "rollup --config",
+    "build:dist": "vite build",
+    "build": "npm -s run build:esm && npm -s run build:dist",
+    "watch": "rollup --config --watch"
   }
 }

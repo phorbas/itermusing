@@ -1,0 +1,69 @@
+import { imm_set, imm_html as h } from 'imm-dom'
+import { imm_on, imm_off, imm_emit_at, imm_defer } from 'imm-dom'
+
+import { itm_sym } from './itm_symbol.jsy'
+
+
+export class ITMRoot ::
+  is_ready() :: return !! @ this.viewmap && this.store
+
+  with_viewmap(viewmap) ::
+    this.viewmap = viewmap.as_itm_viewmap(this)
+
+  with_store(store) ::
+    this.store = store.as_itm_store(this)
+
+  async content_for_key(key, mime) ::
+    return this.store.content_for_key(key, mime)
+
+  async view_for_mime(mime) ::
+    return this.viewmap.view_for_mime(mime)
+
+
+export const _with_itermusing_root = (Base, useParentHost=!Base) =>
+  class ItermusingRoot extends (Base ?? HTMLElement) ::
+    constructor() :: super();
+      this.attachShadow({mode: 'open'})
+
+      const itm_root = this[itm_sym] = new ITMRoot()
+
+      imm_on @ this, @{}
+        itm_find_host: @\ event ::
+          event.detail.push(useParentHost ? this.parentNode : this)
+
+        itm_viewmap: @\ event ::
+          event.stopPropagation()
+          itm_root.with_viewmap(event.detail)
+
+        itm_storage: @\ event ::
+          event.stopPropagation()
+          itm_root.with_store(event.detail)
+
+
+    connectedCallback() ::
+      imm_set @ this.shadowRoot,
+        h.slot @ {name:'store'}, h.iter_musing_store()
+        h.slot @ {name:'view'}, h.iter_musing_views()
+
+      const itm_host = 'BODY' === this.tagName ? this : this.parentNode
+      if null != itm_host[itm_sym] ::
+        throw new Error('Itermusing host already initialized')
+
+      const itm_root = this[itm_sym]
+      const _host_events = @{}
+        itm_find_root: event => itm_root.is_ready() ? event.detail.push(itm_root) : null
+
+      imm_on(itm_host, _host_events)
+      imm_emit_at @ itm_host, 'itm_set_root', itm_host[itm_sym] = itm_root
+
+      this._unsub_host = @::
+        this._unsub_host = null
+        imm_off(itm_host, _host_events)
+        if itm_host[itm_sym] === itm_root ::
+          imm_emit_at @ itm_host, 'itm_set_root', itm_host[itm_sym] = null
+
+      return this
+
+    disconnectedCallback() ::
+      this._unsub_host?.()
+

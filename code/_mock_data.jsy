@@ -1,0 +1,35 @@
+import { hex_to_u8, as_hex_pair } from '@phorbas/store'
+
+export async function _mock_init_store(stg) ::
+  console.log @ "MOCK", stg
+  let [,hk1_html] = as_hex_pair @ await stg.store_utf8 @ `\
+    <section>
+    <h3>Blah</h3>
+
+    <p>So much blah blah blah</p>
+    </section>
+    `
+  if 0 ::
+    console.log @ "MOCK", @{} hk1_html
+
+    let rt_html = await stg.fetch_utf8 @ hex_to_u8 @ hk1_html
+    console.log @ "MOCK", @{} rt_html
+
+
+  let [,hk1_markdown] = as_hex_pair @ await stg.store_utf8 @ `\
+    # Bonjour
+    This is some markdown content
+    `
+  if 0 ::
+    console.log @ "MOCK", @{} hk1_markdown
+
+    let rt_markdown = await stg.fetch_utf8 @ hex_to_u8 @ hk1_markdown
+    console.log @ "MOCK", @{} rt_markdown
+
+  let [,hk1_md_view] = as_hex_pair @ await stg.store_utf8 @ `\
+    import "https://md-block.verou.me/md-block.js"
+    console.log @ "Registered md-block!"
+    `
+
+  return stg
+

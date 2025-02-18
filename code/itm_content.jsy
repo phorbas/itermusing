@@ -1,0 +1,22 @@
+import { imm_set, imm_html as h, imm_raf } from 'imm-dom'
+import { ItmElement, itm_find_roots } from './itm_utils.jsy'
+
+
+export class ITMContent extends ItmElement ::
+  async connectedCallback() ::
+    let [imm_root] = await itm_find_roots(this)
+
+    let key = this.getAttribute('k')
+    let mime = this.getAttribute('mime')
+    let content = imm_root.content_for_key(key, mime)
+    let view_fn = imm_root.view_for_mime(mime, content)
+
+    ;[content, view_fn] = await Promise.all @# content, view_fn
+
+    if ! view_fn ::
+      return imm_set @ this.shadowRoot,
+        h.pre @ `<!-- viewNotFound: ${mime} -->`,
+
+    imm_set @ this.shadowRoot, h.slot()
+    imm_set @ this, await view_fn(content, key, mime)
+

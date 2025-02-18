@@ -1,0 +1,40 @@
+import { imm_wcemit } from 'imm-dom'
+import { imm_html as h } from 'imm-dom'
+import { ItmElement } from './itm_utils.jsy'
+
+const _basic_views = Object.entries @:
+  'text/html': async content =>
+    h.div @: '=innerHTML': await content.text()
+
+  'text/plain': async content =>
+    h.pre @ `${await content.text()}`
+
+  'text/md': 'text/markdown'
+  'text/markdown': async content =>
+    h.fragment @
+      h.script @ {type: 'module'},
+        `import "https://md-block.verou.me/md-block.js"`
+      h.md_block @ `${await content.text()}`
+
+
+export class ITMViewMap ::
+  constructor() ::
+    this._lut = new Map(_basic_views)
+
+  as_itm_viewmap() :: return this
+
+  async view_for_mime(mime) ::
+    let view_fn = this._lut.get(mime)
+    // resolve aliases
+    while view_fn && !view_fn.call ::
+      view_fn = this._lut.get(view_fn)
+    return view_fn
+
+
+export class ItermusingViews extends ItmElement ::
+  connectedCallback() ::
+    this.viewmap = new ITMViewMap
+    imm_wcemit @ this, 'itm_viewmap', this.viewmap
+
+  disconnectedCallback() ::
+    this._unsub_host?.()

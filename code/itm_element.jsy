@@ -1,0 +1,37 @@
+import { imm_set, h, itm_disco, _itm_ctx_ } from './itm_utils.jsy'
+
+export class ItmElement extends HTMLElement ::
+  constructor() :: super();
+    this.attachShadow({mode: 'open'}).append(h.slot())
+
+  get key() :: return this.getAttribute('k')
+  get mime() :: return this.getAttribute('mime')
+  get dep() :: return this.getAttribute('dep')
+
+  async connectedCallback() ::
+    let _itm_ = await itm_disco(this, 'store', 'views')
+
+    let {mime, key, dep} = this
+    dep &&= await _itm_.store.import_at(dep)
+    let content = _itm_.store.content_at(key, mime)
+    let view_ctx = _itm_ctx_.with @: mime, content, key, _itm_, elem:this
+    let view_fn = this._find_view(_itm_, dep, view_ctx)
+    ; [content, view_fn] = await Promise.all([content, view_fn])
+
+    imm_set(this, await view_fn(content, view_ctx))
+
+  async _find_view(_itm_, dep, view_ctx) ::
+    let view
+    if dep ::
+      view = dep.view_for ? dep
+        : await dep.itm_find_view?.(view_ctx)
+
+    view ??= await _itm_.views.itm_find_view(view_ctx)
+
+    if null == await view_ctx.content ::
+      return view?.view_absent ?? _itm_.views.view_absent(view_ctx)
+
+    view = view?.view_for ?? view
+    view ??= _itm_.views.view_missing(view_ctx)
+    return view
+

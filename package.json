@@ -1,7 +1,6 @@
 {
-  "private": true,
   "name": "@phorbas/itermusing",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Self-hosting pasture for your musing paths: notes, collections, articles, snippets, and more.",
   "license": "BSD-2-Clause",
   "author": "Shane Holloway <shane.holloway@ieee.org>",
@@ -20,7 +19,8 @@
   "type": "module",
   "exports": {
     ".": "./esm/itermusing.js",
-    "./esm": "./esm"
+    "./esm": "./esm",
+    "./itermusing.css": "./itermusing.css"
   },
   "devDependencies": {
     "@phorbas/hamt": "file:../hamt",
@@ -35,7 +35,7 @@
     "vite": "^6.1.0"
   },
   "scripts": {
-    "clean": "rm -rf ./dist ./esm",
+    "clean": "rm -rf ./dist ./esm ./esm-mock",
     "dgnotify": "rollup-plugin-dgnotify",
     "previte": "npm -s run build:esm",
     "vite": "vite",

@@ -2,7 +2,6 @@ import {_rpis_, default as rollupOptions} from './rollup.config.js'
 
 const entrypoints = [
   './index.html',
-  './sw.js',
 ]
 
 export default {

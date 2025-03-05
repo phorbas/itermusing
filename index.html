@@ -7,42 +7,37 @@
 
   <link rel=icon href='data:image/png;base64,' />
   <style>
-    @layer reset, wa, theme;
     /* Theme: webawesome.css or native.css */
     @import url("https://early.webawesome.com/webawesome@3.0.0-alpha.10/dist/styles/webawesome.css") layer(wa);
 
     /* Theme: default.css or awesome.css or classic.css */
     @import url("https://early.webawesome.com/webawesome@3.0.0-alpha.10/dist/styles/themes/default.css") layer(theme);
+
+    /* Itermusing web component defaults */
+    @import url('./itermusing.css') layer(itm);
+
+    @layer reset, wa, theme, itm;
   </style>
 
   <script type=module crossorigin src="https://early.webawesome.com/webawesome@3.0.0-alpha.10/dist/webawesome.loader.js"></script>
-  <script type=module src='/esm/itermusing.js?register'></script>
-</head>
-<body>
-  <iter-musing></iter-musing>
+  <script type=module src='/esm/itermusing.js?boot'></script>
+</head> <body>
 
-  <h6>text/plain of HTML content</h6>
-  <itm-c k='c7eb67d4ec9f66f79850e06a2b3baa5598b2333ea220ee792f80a5bee7c2b473' mime='text/plain'></itm-c>
+<iter-musing init-mock='/esm-mock/mock_data.js' dep-wa='/esm-mock/itm_wa_views.js'></iter-musing>
 
-  <h6>text/html</h6>
-  <itm-c k='c7eb67d4ec9f66f79850e06a2b3baa5598b2333ea220ee792f80a5bee7c2b473' mime='text/html'></itm-c>
+<h6>text/plain of HTML content</h6>
+<itm-b mime='text/plain' k='c7eb67d4ec9f66f79850e06a2b3baa5598b2333ea220ee792f80a5bee7c2b473'></itm-b>
 
-  <h6>text/plain of Markdown content</h6>
-  <itm-c k='6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26' mime='text/plain'></itm-c>
+<h6>text/html</h6>
+<itm-b mime='text/html' k='c7eb67d4ec9f66f79850e06a2b3baa5598b2333ea220ee792f80a5bee7c2b473'></itm-b>
 
-  <h6>Rendered text/markdown content</h6>
-  <itm-c k='6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26'
-    dep='e26f111831ac615a29d9c112a37ed3c1817654d8fbcd107142410deff816395a'
-    mime='text/md'></itm-c>
+<h6>text/plain of Markdown content</h6>
+<itm-b mime='text/plain' k='6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26'></itm-b>
 
-  <h6>Source of text/markdown view loader</h6>
-  <itm-c k='e26f111831ac615a29d9c112a37ed3c1817654d8fbcd107142410deff816395a'
-    mime='text/plain'></itm-c>
+<h6>Rendered text/markdown content</h6>
+<itm-b mime='text/markdown' k='6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26'
+  dep='e26f111831ac615a29d9c112a37ed3c1817654d8fbcd107142410deff816395a'></itm-b>
 
-<!--
-<body is=iter-musing-body>
-<body>
-  <iter-musing></iter-musing>
+<h6>Source of text/markdown view loader</h6>
+<itm-b mime='text/plain' k='e26f111831ac615a29d9c112a37ed3c1817654d8fbcd107142410deff816395a'></itm-b>
 
-<script type=module src='./sketch/awesome.jsy'></script>
--->

@@ -1,22 +1,23 @@
-import { imm_evt } from 'imm-dom'
-
-import { opaque_basic } from '@phorbas/opaque/esm/web/index.mjs'
+import { opaque_basic as opaque } from '@phorbas/opaque/esm/web/index.mjs'
 import { phorbas_store, hex_to_u8 } from '@phorbas/store'
-import { bkc_with_js_map } from '@phorbas/store'
-import bkc_with_web_db from '@phorbas/store/esm/web/web_db.mjs'
-//import bkc_with_web_cache from '@phorbas/store/esm/web/web_cache.mjs'
+import bkc_with_dom from '@phorbas/store/esm/web/web_dom.mjs'
+//import bkc_with_web_db from '@phorbas/store/esm/web/web_db.mjs'
+//db: phorbas_store @ bkc_with_web_db(), {opaque}
 
-import { itm_find_host } from './itm_utils.jsy'
-import {_mock_init_store} from './_mock_data.jsy'
+const _rx_cdn = /^https?:\/\/|^\//
 
-
-export class ITMStore ::
-  constructor(_stg_) :: this._stg_ = _stg_
-  as_itm_store() :: return this
+export class ItmStore ::
+  constructor(host_elem) ::
+    let boot = phorbas_store @ bkc_with_dom(host_elem), {opaque}
+    this.stg = @{} boot, db: boot
 
   async content_at(key, mime) ::
-    let bk = hex_to_u8(key)
-    let res = await this._stg_.fetch_content(bk)
+    let loc = 'db'
+    if key.includes('~') ::
+      [loc, key] = key.split('~')
+
+    let stg = await this.stg[loc]
+    let res = await stg.fetch_content(hex_to_u8(key))
     return res ? new Blob([res], {type:mime}) : res
 
   _url_cache = new Map()
@@ -28,28 +29,9 @@ export class ITMStore ::
           .then @ res => URL.createObjectURL(res)
     return res
 
-
-export class ItermusingStore extends HTMLElement ::
-  constructor() :: super();
-    this.attachShadow({mode: 'open'})
-
-  async connectedCallback() ::
-    const mode = this.getAttribute('mode') || 'content'
-    const store = this.store ??= await this._init_store_()
-
-    const [itm_host] = await itm_find_host(this)
-    this._unsub_host = imm_evt @ itm_host, @{}
-      itm_find_store(event) ::
-        event.detail[mode] = store
-
-  disconnectedCallback() ::
-    this._unsub_host?.()
-
-  async _init_store_() ::
-    //let _bkc_stg = bkc_with_js_map()
-    let _bkc_stg = bkc_with_web_db()
-    let stg = await phorbas_store(_bkc_stg, { opaque: opaque_basic })
-
-    await _mock_init_store(stg)
-    return new ITMStore(stg)
+  async import_at(url_or_key, opt) ::
+    let js_url = _rx_cdn.test(url_or_key)
+      ? new URL(url_or_key, globalThis.location)
+      : await this.content_url_at(url_or_key, 'text/javascript')
+    return import(/* @vite-ignore */ js_url, {... opt})
 

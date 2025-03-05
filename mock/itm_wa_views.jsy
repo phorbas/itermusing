@@ -1,0 +1,20 @@
+const _view_dbg = msg => (_, {mime, key, h}) =>
+  h.pre @: 
+    class: 'wa-callout wa-warning'
+    $: `${msg}: ${mime} ${key}`
+
+
+const _mock_webawesome_views = @{}
+  absent: _view_dbg('content absent')
+  missing: _view_dbg('view missing')
+
+  'text/plain': async (content, {h}) =>
+    h.pre @ `${await content.text()}`
+
+  'text/html': async (content, {h}) =>
+    h.div @: '=innerHTML': await content.text()
+
+
+export async function itm_init({viewmap, store, h}) ::
+  Object.assign @ viewmap.by_mime, _mock_webawesome_views
+

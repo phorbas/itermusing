@@ -1,0 +1,28 @@
+const _view_dbg = msg => (_, kw) =>
+  document.createComment(` ${msg}: ${kw.mime} ${kw.key} `)
+
+const _builtin_views = @{}
+  __proto__: null
+  absent: _view_dbg('content absent')
+  missing: _view_dbg('view missing')
+
+
+export class ItmViewmap ::
+  by_mime = @{} __proto__: _builtin_views
+
+  async itm_find_view({elem, mime, content}) ::
+    let view_fn
+    view_fn ??= this.find_mime(mime)
+    return view_fn
+
+  find_mime(mime, by_mime=this.by_mime) ::
+    let view_fn = by_mime[mime]
+    while view_fn && !view_fn.call ::
+      view_fn = by_mime[view_fn] // resolve aliases
+    return view_fn
+
+  view_absent(view_ctx) ::
+    return this.by_mime.absent
+  view_missing(view_ctx) ::
+    return this.by_mime.missing
+

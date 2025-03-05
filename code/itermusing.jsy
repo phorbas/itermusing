@@ -1,21 +1,55 @@
-import { itm_sym } from './itm_symbol.jsy'
-import { _with_itermusing_root } from './itm_root.jsy'
-import { ItermusingStore } from './itm_store.jsy'
-import { ItermusingViews } from './itm_views.jsy'
-import { ITMContent } from './itm_content.jsy'
+import { ItmStore } from './itm_store.jsy'
+import { ItmViewmap } from './itm_viewmap.jsy'
+import { ItmElement } from './itm_element.jsy'
+
+import { imm_evt, itm_disco, _itm_ctx_ } from './itm_utils.jsy'
+
+
+export class Itermusing extends HTMLElement ::
+  async connectedCallback() ::
+    this._evt_rm?.()
+
+    const el_parent = this.parentNode
+    await this.init_deps @
+      _itm_ctx_.with @:
+        elem: el_parent
+        store: this.store
+        viewmap: this.viewmap
+
+    this._evt_rm = imm_evt @ el_parent, @{}
+      itm_disco: (event) => ::
+        event.detail.store ??= this.store
+        event.detail.views ??= this.viewmap
+
+  disconnectedCallback() ::
+    this._evt_rm?.()
+
+  async init_deps(init_ctx) ::
+    let store = this.store
+    for let attr of this.getAttributeNames() ::
+      if /^(init|dep)(-\w+)?/.test(attr) ::
+        let dep = await store.import_at(this.getAttribute(attr))
+        await dep.itm_init?.(init_ctx)
+
+        if /^init/.test(attr) :: this.removeAttribute(attr)
+
+
+
 
 const import_opt = new URL(import.meta.url).searchParams
+if import_opt.has('boot') ::
+  customElements.define @ 'iter-musing',
+    class extends Itermusing ::
+      store = new ItmStore(this)
+      viewmap = new ItmViewmap(this)
 
-if import_opt.has('register') ::
-  customElements.define @ 'iter-musing', _with_itermusing_root()
-  customElements.define @ 'iter-musing-body',
-    _with_itermusing_root(HTMLBodyElement)
-    { extends: 'body' }
+  for let suffix of 'n b i ib f if g ig li tr tbl'.split(' ') ::
+    customElements.define @ 'itm-'+suffix,
+      class extends ItmElement ::
 
-  customElements.define @ 'iter-musing-store', ItermusingStore
-  customElements.define @ 'iter-musing-views', ItermusingViews
 
-  customElements.define @ 'itm-c', ITMContent
+export * from './itm_utils.jsy'
+export * from './itm_store.jsy'
+export * from './itm_viewmap.jsy'
+export * from './itm_element.jsy'
 
-export @{}
-  itm_sym

@@ -1,0 +1,35 @@
+import { hex_to_u8, u8_to_hex, as_hex_pair } from '@phorbas/store'
+const as_hk1 = ([bk2, bk1]) => u8_to_hex(bk1)
+
+export async function itm_init({store, h}) ::
+  let stg = await store.stg.boot
+
+  let hk1_hello = as_hk1 @ await stg.store_utf8 @ 'hello there boot!'
+  console.log @: hk1_hello
+
+  let hk1_html = as_hk1 @ await stg.store_utf8 @ `\
+    <section>
+    <h3>Blah</h3>
+
+    <p>So much blah blah blah</p>
+    </section>
+    `
+  console.log @: hk1_html
+
+  let hk1_markdown = as_hk1 @ await stg.store_utf8 @ `\
+    # Bonjour
+    This is some markdown content
+    `
+  console.log @: hk1_markdown
+
+  let hk1_md_view = as_hk1 @ await stg.store_utf8 @ `\
+    import "https://md-block.verou.me/md-block.js"
+    console.log("Registered md-block!")
+
+    export const view_for = async (content, {h}) =>
+      h.md_block('' + await content.text() )
+    `
+  console.log @: hk1_md_view
+
+  return stg
+

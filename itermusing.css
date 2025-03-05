@@ -1,0 +1,16 @@
+@layer itm {
+  itermusing-store, itermusing-views { display: none; }
+  itm-n { display: none; }
+  itm-b { display: block; }
+  itm-i { display: inline; }
+  itm-ib { display: inline-block; }
+  itm-f { display: flex; }
+  itm-if { display: inline-flex; }
+  itm-g { display: grid; }
+  itm-ig { display: inline-grid; }
+
+  itm-li { display: list-item; }
+  itm-tr { display: table-row; }
+  itm-tbl { display: table; }
+}
+

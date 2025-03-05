@@ -1,0 +1,29 @@
+import { imm_wcemit, imm_raf, imm_evt } from 'imm-dom'
+import { imm, imm_set, imm_html } from 'imm-dom'
+export { imm_wcemit, imm_raf, imm_evt, imm, imm_set, imm_html, imm_html as h }
+
+export const _itm_ctx_ = @{}
+  with(kw) :: return {__proto__: this, ...kw}
+
+  imm_wcemit, imm_raf, imm_evt,
+  imm, imm_set, imm_html, h: imm_html,
+
+
+export async function itm_disco(el, ...required) ::
+  let res = {}
+
+  retry: // max of 300 render animation frame ticks
+  for let i=300; i--; i>=0 ::
+    // Emit itermusing discovery event to collect context
+    imm_wcemit(el, 'itm_disco', res)
+
+    // Upon any set property, return result
+    for let k of required ::
+      if ! res[k] ::
+        await imm_raf()
+        continue retry
+
+    return res
+
+  throw new Error('itm_disco not found: '+required)
+

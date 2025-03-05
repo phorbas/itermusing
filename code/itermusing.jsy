@@ -8,15 +8,8 @@ import { imm_evt, itm_disco, _itm_ctx_ } from './itm_utils.jsy'
 export class Itermusing extends HTMLElement ::
   async connectedCallback() ::
     this._evt_rm?.()
-
-    const el_parent = this.parentNode
-    await this.init_deps @
-      _itm_ctx_.with @:
-        elem: el_parent
-        store: this.store
-        viewmap: this.viewmap
-
-    this._evt_rm = imm_evt @ el_parent, @{}
+    await this.init_deps()
+    this._evt_rm = imm_evt @ this.parentNode, @{}
       itm_disco: (event) => ::
         event.detail.store ??= this.store
         event.detail.views ??= this.viewmap
@@ -24,10 +17,14 @@ export class Itermusing extends HTMLElement ::
   disconnectedCallback() ::
     this._evt_rm?.()
 
-  async init_deps(init_ctx) ::
-    let store = this.store
+  async init_deps() ::
+    let {store} = this, init_ctx
     for let attr of this.getAttributeNames() ::
       if /^(init|dep)(-\w+)?/.test(attr) ::
+        // lazy initialize init_ctx if used
+        init_ctx ??= _itm_ctx_.with @:
+          store, viewmap: this.viewmap, elem: this
+
         let dep = await store.import_at(this.getAttribute(attr))
         await dep.itm_init?.(init_ctx)
 

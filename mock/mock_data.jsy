@@ -1,35 +1,42 @@
-import { hex_to_u8, u8_to_hex, as_hex_pair } from '@phorbas/store'
-const as_hk1 = ([bk2, bk1]) => u8_to_hex(bk1)
+import { opaque_basic as opaque } from '@phorbas/opaque'
 
 export async function itm_init({store, h}) ::
   let stg = await store.stg.boot
 
-  let hk1_hello = as_hk1 @ await stg.store_utf8 @ 'hello there boot!'
-  console.log @: hk1_hello
+  async function _store_new(content) ::
+    let hk21 = await opaque.from_content(content)
+    await stg.bkc_store(hk21[1], hk21.buf)
+    let rt_buf = await stg.bkc_fetch(hk21[1])
+    return hk21[1]
 
-  let hk1_html = as_hk1 @ await stg.store_utf8 @ `\
+  let hk1_hello = await _store_new @
+    'hello there boot!'
+
+  let hk1_html = await _store_new @ `\
     <section>
     <h3>Blah</h3>
 
     <p>So much blah blah blah</p>
     </section>
     `
-  console.log @: hk1_html
 
-  let hk1_markdown = as_hk1 @ await stg.store_utf8 @ `\
+  let hk1_markdown = await _store_new @ `\
     # Bonjour
     This is some markdown content
     `
-  console.log @: hk1_markdown
 
-  let hk1_md_view = as_hk1 @ await stg.store_utf8 @ `\
+  let hk1_md_view = await _store_new @ `\
     import "https://md-block.verou.me/md-block.js"
     console.log("Registered md-block!")
 
     export const view_for = async (content, {h}) =>
       h.md_block('' + await content.text() )
     `
-  console.log @: hk1_md_view
+  console.log @:
+    hk1_hello
+    hk1_html
+    hk1_markdown
+    hk1_md_view
 
   return stg
 

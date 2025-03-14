@@ -1,0 +1,57 @@
+import { imm_evt, imm_wcemit, imm_raf } from './itm_utils.jsy'
+import { import_at } from './itm_utils.jsy'
+
+let _reg_disco_impluse
+
+export class ItmDisco ::
+  static register(el, itm_disco) ::
+    let _unreg = imm_evt @ el.parentNode, @:
+      itm_disco: (evt) => itm_disco(evt.detail)
+
+    _reg_disco_impluse?.resolve(this)
+    _reg_disco_impluse = null
+    return _unreg
+
+  static on_update() ::
+    _reg_disco_impluse ??= Promise.withResolvers()
+    return _reg_disco_impluse.promise
+
+
+  static async * discover(el) ::
+    let disco = new this()
+    while 1 ::
+      imm_wcemit(el, 'itm_disco', disco)
+      yield disco
+
+      await this.on_update()
+
+
+  viewmaps = []
+  add_viewmap(viewmap) ::
+    if viewmap :: this.viewmaps.push(viewmap)
+    return this
+
+  find_mime(mime) ::
+    for let tgt of this.viewmaps ::
+      let view = tgt.find_mime(mime)
+      if view :: return view
+
+
+  stores = []
+  add_store(store) ::
+    if store :: this.stores.push(store)
+
+  find_store(key, loc) ::
+    return this.stores[0]
+
+  content_at(key, mime) ::
+    let store = this.find_store(key)
+    return store?.content_at(key, mime)
+
+  content_url_at(key, mime) ::
+    let store = this.find_store(key)
+    return store?.content_url_at(key, mime)
+
+  async import_at(url_or_key, opt) ::
+    return import_at(this, url_or_key, opt)
+

@@ -1,35 +1,31 @@
 import { ItmStore } from './itm_store.jsy'
 import { ItmViewmap } from './itm_viewmap.jsy'
-import { ItmElement } from './itm_element.jsy'
+import { ItmContent } from './itm_element.jsy'
 
-import { imm_evt, itm_disco, _itm_ctx_ } from './itm_utils.jsy'
+import { _itm_ctx_, _itm_init_deps } from './itm_utils.jsy'
+import { ItmDisco } from './itm_disco.jsy'
 
 
 export class Itermusing extends HTMLElement ::
   async connectedCallback() ::
-    this._evt_rm?.()
+    this._unreg?.()
+
     await this.init_deps()
-    this._evt_rm = imm_evt @ this.parentNode, @{}
-      itm_disco: (event) => ::
-        event.detail.store ??= this.store
-        event.detail.views ??= this.viewmap
+
+    this._unreg = ItmDisco.register @ this,
+      @\ disco ::
+        disco.add_store(this.store)
+        disco.add_viewmap(this.viewmap)
+
 
   disconnectedCallback() ::
-    this._evt_rm?.()
+    this._unreg?.()
 
   async init_deps() ::
-    let {store} = this, init_ctx
-    for let attr of this.getAttributeNames() ::
-      if /^(init|dep)(-\w+)?/.test(attr) ::
-        // lazy initialize init_ctx if used
-        init_ctx ??= _itm_ctx_.with @:
-          store, viewmap: this.viewmap, elem: this
-
-        let dep = await store.import_at(this.getAttribute(attr))
-        await dep.itm_init?.(init_ctx)
-
-        if /^init/.test(attr) :: this.removeAttribute(attr)
-
+    await _itm_init_deps @: 
+      elem: this,
+      store: this.store,
+      viewmap: this.viewmap
 
 
 
@@ -42,10 +38,11 @@ if import_opt.has('boot') ::
 
   for let suffix of 'n b i ib f if g ig li tr tbl'.split(' ') ::
     customElements.define @ 'itm-'+suffix,
-      class extends ItmElement ::
+      class extends ItmContent ::
 
 
 export * from './itm_utils.jsy'
+export * from './itm_disco.jsy'
 export * from './itm_store.jsy'
 export * from './itm_viewmap.jsy'
 export * from './itm_element.jsy'

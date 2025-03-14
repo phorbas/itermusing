@@ -17,4 +17,5 @@ const _mock_webawesome_views = @{}
 
 export async function itm_init({viewmap, store, h}) ::
   Object.assign @ viewmap.by_mime, _mock_webawesome_views
+  console.log @ 'Registered Viewmap:', viewmap
 

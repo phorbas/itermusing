@@ -1,14 +1,13 @@
-import { opaque_basic as opaque } from '@phorbas/opaque/esm/web/index.mjs'
-import { phorbas_store, hex_to_u8 } from '@phorbas/store'
-import bkc_with_dom from '@phorbas/store/esm/web/web_dom.mjs'
-//import bkc_with_web_db from '@phorbas/store/esm/web/web_db.mjs'
-//db: phorbas_store @ bkc_with_web_db(), {opaque}
+import { bkc_web_dom } from '@phorbas/store/esm/web/web_dom.js'
+import { bkc_web_db } from '@phorbas/store/esm/web/web_db.js'
+import { import_at } from './itm_utils.jsy'
 
-const _rx_cdn = /^https?:\/\/|^\//
+const bkc_itermusing_boot = bkc_web_dom
+//const bkc_itermusing_boot = bkc_web_db
 
 export class ItmStore ::
   constructor(host_elem) ::
-    let boot = phorbas_store @ bkc_with_dom(host_elem), {opaque}
+    let boot = bkc_itermusing_boot(host_elem)
     this.stg = @{} boot, db: boot
 
   async content_at(key, mime) ::
@@ -17,7 +16,7 @@ export class ItmStore ::
       [loc, key] = key.split('~')
 
     let stg = await this.stg[loc]
-    let res = await stg.fetch_content(hex_to_u8(key))
+    let res = await stg.bkc_fetch(key)
     return res ? new Blob([res], {type:mime}) : res
 
   _url_cache = new Map()
@@ -26,12 +25,9 @@ export class ItmStore ::
     if ! res ::
       this._url_cache.set @ key, res = @
         this.content_at(key, mime)
-          .then @ res => URL.createObjectURL(res)
+          .then @ res => res && URL.createObjectURL(res)
     return res
 
   async import_at(url_or_key, opt) ::
-    let js_url = _rx_cdn.test(url_or_key)
-      ? new URL(url_or_key, globalThis.location)
-      : await this.content_url_at(url_or_key, 'text/javascript')
-    return import(/* @vite-ignore */ js_url, {... opt})
+    return import_at(this, url_or_key, opt)
 

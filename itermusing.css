@@ -1,5 +1,5 @@
 @layer itm {
-  itermusing-store, itermusing-views { display: none; }
+  iter-musing, itermusing-store, itermusing-views { display: none; }
   itm-n { display: none; }
   itm-b { display: block; }
   itm-i { display: inline; }

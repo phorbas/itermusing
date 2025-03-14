@@ -1,6 +1,14 @@
-import { imm_set, h, itm_disco, _itm_ctx_ } from './itm_utils.jsy'
+import { ItmDisco } from './itm_disco.jsy'
+import { imm_set, h, _itm_ctx_ } from './itm_utils.jsy'
 
-export class ItmElement extends HTMLElement ::
+const 
+    _view_dbg = msg => (_, kw) =>
+      document.createComment(` ${msg}: ${kw.mime} ${kw.key} `)
+  , _view_absent = _view_dbg('content absent')
+  , _view_missing = _view_dbg('view missing')
+
+
+export class ItmContent extends HTMLElement ::
   constructor() :: super();
     this.attachShadow({mode: 'open'}).append(h.slot())
 
@@ -9,16 +17,18 @@ export class ItmElement extends HTMLElement ::
   get dep() :: return this.getAttribute('dep')
 
   async connectedCallback() ::
-    let _itm_ = await itm_disco(this, 'store', 'views')
+    for await let _itm_ of ItmDisco.discover(this) ::
+      if 0 === _itm_.stores.length || 0 === _itm_.viewmaps.length ::
+        continue
 
-    let {mime, key, dep} = this
-    dep &&= await _itm_.store.import_at(dep)
-    let content = _itm_.store.content_at(key, mime)
-    let view_ctx = _itm_ctx_.with @: mime, content, key, _itm_, elem:this
-    let view_fn = this._find_view(_itm_, dep, view_ctx)
-    ; [content, view_fn] = await Promise.all([content, view_fn])
+      let {mime, key, dep} = this
+      let content = _itm_.content_at(key, mime)
+      dep &&= await _itm_.import_at(dep)
+      let view_ctx = _itm_ctx_.with @: mime, content, key, _itm_, elem:this
+      let view_fn = this._find_view(_itm_, dep, view_ctx)
+      ; [content, view_fn] = await Promise.all([content, view_fn])
 
-    imm_set(this, await view_fn(content, view_ctx))
+      imm_set(this, await view_fn(content, view_ctx))
 
   async _find_view(_itm_, dep, view_ctx) ::
     let view
@@ -26,12 +36,12 @@ export class ItmElement extends HTMLElement ::
       view = dep.view_for ? dep
         : await dep.itm_find_view?.(view_ctx)
 
-    view ??= await _itm_.views.itm_find_view(view_ctx)
+    view ??= _itm_.find_mime(view_ctx.mime)
 
     if null == await view_ctx.content ::
-      return view?.view_absent ?? _itm_.views.view_absent(view_ctx)
+      return view?.view_absent ?? _itm_.find_mime('absent') ?? _view_absent
 
     view = view?.view_for ?? view
-    view ??= _itm_.views.view_missing(view_ctx)
+    view ??= _itm_.find_mime('missing') ?? _view_missing
     return view
 

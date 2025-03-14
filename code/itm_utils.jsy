@@ -1,39 +1,27 @@
-import { imm_wcemit, imm_raf, imm_evt } from 'imm-dom'
+import { imm_raf } from 'imm-dom'
 import { imm, imm_set, imm_html } from 'imm-dom'
-export { imm_wcemit, imm_raf, imm_evt, imm, imm_set, imm_html, imm_html as h }
+export { imm_raf, imm, imm_set, imm_html, imm_html as h }
 
 export const _itm_ctx_ = @{}
-  with(kw) :: return {__proto__: this, ...kw}
+  with(kw, kw2) :: return {__proto__: this, ...kw, ...kw2}
 
-  imm_wcemit, imm_raf, imm_evt,
-  imm, imm_set, imm_html, h: imm_html,
-
-const _rx_cdn = /^https?:\/\/|^\//
+  imm_raf, imm, imm_set, imm_html, h: imm_html,
 
 
-export async function import_at(store, url_or_key, opt) ::
-  let js_url = _rx_cdn.test(url_or_key)
-    ? new URL(url_or_key, globalThis.location)
-    : await store.content_url_at(url_or_key, 'text/javascript')
+const _as_attr_match = test => test.call ? test
+  : test.exec ? attr => test.exec(attr)
+  : test.test ? attr => test.test(attr)
+  : test.includes ? attr => test.includes(attr)
+  : attr => attr == test
 
-  if js_url ::
-    return await import(/* @vite-ignore */ js_url, {... opt})
+export function * itm_attrs(elem, test, test_init) ::
+  test = _as_attr_match(test)
+  test_init &&= _as_attr_match(test_init)
 
-
-const _rx_import = /^(?:(init)|(dep))(?:-\w+)?/
-export function * _itm_import_deps({elem, store}) ::
   for let attr of elem.getAttributeNames() ::
-    let is_dep = _rx_import.exec(attr)
-    let url_or_key = is_dep && elem.getAttribute(attr)
-    if url_or_key ::
-      if is_dep[1] :: elem.removeAttribute(attr)
-
-      yield import_at(store, url_or_key)
-
-
-export async function _itm_init_deps(init_ctx) ::
-  init_ctx = _itm_ctx_.with(init_ctx)
-  for let module of _itm_import_deps(init_ctx) ::
-    module = await module
-    await module?.itm_init?.(init_ctx)
+    let init = test_init(attr)
+    if init || test(attr) ::
+      let res = [attr, elem.getAttribute(attr)]
+      if init :: elem.removeAttribute(attr)
+      yield res
 

@@ -1,33 +1,9 @@
+import { bkc_storage_verify, bkc_extend, bkc_multi } from '@phorbas/store/esm/xform/bkc_multi.js'
 import { bkc_web_dom } from '@phorbas/store/esm/web/web_dom.js'
-import { bkc_web_db } from '@phorbas/store/esm/web/web_db.js'
-import { import_at } from './itm_utils.jsy'
+//import { bkc_web_db } from '@phorbas/store/esm/web/web_db.js'
 
-const bkc_itermusing_boot = bkc_web_dom
-//const bkc_itermusing_boot = bkc_web_db
-
-export class ItmStore ::
-  constructor(host_elem) ::
-    let boot = bkc_itermusing_boot(host_elem)
-    this.stg = @{} boot, db: boot
-
-  async content_at(key, mime) ::
-    let loc = 'db'
-    if key.includes('~') ::
-      [loc, key] = key.split('~')
-
-    let stg = await this.stg[loc]
-    let res = await stg.bkc_fetch(key)
-    return res ? new Blob([res], {type:mime}) : res
-
-  _url_cache = new Map()
-  content_url_at(key, mime) ::
-    let res = this._url_cache.get(key)
-    if ! res ::
-      this._url_cache.set @ key, res = @
-        this.content_at(key, mime)
-          .then @ res => res && URL.createObjectURL(res)
-    return res
-
-  async import_at(url_or_key, opt) ::
-    return import_at(this, url_or_key, opt)
+export async function bkc_itm_store(elem_db_boot) ::
+  let bkc_boot = bkc_web_dom(elem_db_boot)
+  return bkc_storage_verify @
+    bkc_extend @ bkc_boot, @{}
 

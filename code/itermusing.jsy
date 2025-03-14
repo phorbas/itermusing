@@ -1,49 +1,15 @@
-import { ItmStore } from './itm_store.jsy'
-import { ItmViewmap } from './itm_viewmap.jsy'
-import { ItmContent } from './itm_element.jsy'
-
-import { _itm_ctx_, _itm_init_deps } from './itm_utils.jsy'
-import { ItmDisco } from './itm_disco.jsy'
-
-
-export class Itermusing extends HTMLElement ::
-  async connectedCallback() ::
-    this._unreg?.()
-
-    await this.init_deps()
-
-    this._unreg = ItmDisco.register @ this,
-      @\ disco ::
-        disco.add_store(this.store)
-        disco.add_viewmap(this.viewmap)
-
-
-  disconnectedCallback() ::
-    this._unreg?.()
-
-  async init_deps() ::
-    await _itm_init_deps @: 
-      elem: this,
-      store: this.store,
-      viewmap: this.viewmap
-
-
+import { ItmView } from './itm_view.jsy'
+import { ItermusingRoot } from './itm_root.jsy'
+import { bkc_itm_store } from './itm_store.jsy'
 
 const import_opt = new URL(import.meta.url).searchParams
 if import_opt.has('boot') ::
   customElements.define @ 'iter-musing',
-    class extends Itermusing ::
-      store = new ItmStore(this)
-      viewmap = new ItmViewmap(this)
+    class extends ItermusingRoot ::
+      stg = bkc_itm_store(this)
+      viewmap = new Map()
 
-  for let suffix of 'n b i ib f if g ig li tr tbl'.split(' ') ::
-    customElements.define @ 'itm-'+suffix,
-      class extends ItmContent ::
+  customElements.define @ 'it-m',
+    class extends ItmView ::
 
-
-export * from './itm_utils.jsy'
-export * from './itm_disco.jsy'
-export * from './itm_store.jsy'
-export * from './itm_viewmap.jsy'
-export * from './itm_element.jsy'
 

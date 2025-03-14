@@ -14,7 +14,10 @@
     @import url("https://early.webawesome.com/webawesome@3.0.0-alpha.10/dist/styles/themes/default.css") layer(theme);
 
     /* Itermusing web component defaults */
-    @import url('./itermusing.css') layer(itm);
+    @layer itm {
+      iter-musing { display: none; }
+      it-m { display: block; }
+    }
 
     @layer reset, wa, theme, itm;
   </style>
@@ -30,18 +33,18 @@
 ></iter-musing>
 
 <h6>text/plain of HTML content</h6>
-<itm-b mime='text/plain' k='c7eb67d4ec9f66f79850e06a2b3baa5598b2333ea220ee792f80a5bee7c2b473'></itm-b>
+<it-m mime='text/plain' k='bkc:c7eb67d4ec9f66f79850e06a2b3baa5598b2333ea220ee792f80a5bee7c2b473'></it-m>
 
 <h6>text/html</h6>
-<itm-b mime='text/html' k='c7eb67d4ec9f66f79850e06a2b3baa5598b2333ea220ee792f80a5bee7c2b473'></itm-b>
+<it-m mime='text/html' k='bkc:c7eb67d4ec9f66f79850e06a2b3baa5598b2333ea220ee792f80a5bee7c2b473'></it-m>
 
 <h6>text/plain of Markdown content</h6>
-<itm-b mime='text/plain' k='6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26'></itm-b>
+<it-m mime='text/plain' k='bkc:6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26'></it-m>
 
 <h6>Rendered text/markdown content</h6>
-<itm-b mime='text/markdown' k='6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26'
-  dep='e26f111831ac615a29d9c112a37ed3c1817654d8fbcd107142410deff816395a'></itm-b>
+<it-m mime='text/markdown' k='6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26'
+  dep="bkc:e7f722428fb7da5f9999bf2359b3d10f90831b5f4c7cba347f41ddc335769ad8" ></it-m>
 
 <h6>Source of text/markdown view loader</h6>
-<itm-b mime='text/plain' k='e26f111831ac615a29d9c112a37ed3c1817654d8fbcd107142410deff816395a'></itm-b>
+<it-m mime='text/plain' k="bkc:e7f722428fb7da5f9999bf2359b3d10f90831b5f4c7cba347f41ddc335769ad8"></it-m>
 

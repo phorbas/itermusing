@@ -1,0 +1,81 @@
+export async function * aiter_when_update(when_db, opt_ctx={}) ::
+  var _dp_update, _cache = new Map()
+
+  function on_update(key, value) ::
+    let prev = _cache.get(key)
+    if prev===undefined && !_cache.has(key) ::
+      //First assignment; avoid re-triggering update
+      _cache.set(key, value)
+    else if value !== prev ::
+      //Subsequent assignment; do triggering update
+      _cache.set(key, value)
+      _dp_update.resolve(true) // trigger composite update
+    else :: //Identical assignment; avoid re-triggering update
+
+
+  // wrap when_db in a watch observer
+  when_db = when_map_watch(when_db, {
+    __proto__: opt_ctx, on_update })
+
+  let when_pxy = opt_ctx.adapt
+    ? opt_ctx.adapt(when_db) // allow wrapping the when_db; e.g. as a Proxy()
+    : when_db // or passthrough
+
+  const {signal, pre_tick, tick, post_tick} = opt_ctx
+  while ! signal?.aborted ::
+    //some dependency updated
+    await _dp_update?.promise
+
+    // wait throttled; e.g. requestAnimationFrame
+    ; pre_tick && await pre_tick()
+
+    //reset watcher
+    _dp_update = Promise.withResolvers()
+
+    ; tick && await tick()
+
+    // return when_pxy (or proxy) because something changed
+    yield when_pxy
+
+    ; post_tick && await post_tick()
+
+
+export function when_map_watch(db, opt={}) ::
+  let { refs, assigns, on_update, signal } = opt
+  if on_update && !refs :: refs = new Set()
+
+  const _write = key => assigns?.add(key)
+  const _read = key => ::
+    if on_update && !refs.has(key) ::
+      db.subscribe(key, on_update, signal)
+    refs?.add(key)
+
+  return @{}
+    __proto__: null
+    has: key => (_read(key), db.has(key))
+    get: key => (_read(key), db.get(key))
+    when: key => (_read(key), db.when(key))
+    set: (key, value) => (_write(key), db.set(key,v))
+    set_when: (key, value) => (_write(key), db.set_when(key,v))
+
+
+const _when_map_pxy_ = @{}
+  has: (map_db, key) => key !== 'then' ? map_db.has(key) : null
+  get: (map_db, key) => key !== 'then' ? map_db.when(key) : null
+  set: (map_db, key, value) => key !== 'then' ? map_db.set_when(key, value) : null
+
+export async function * aiter_when_call(when_db, opt_ctx={}) ::
+  if opt_ctx.as_proxy ::
+    opt_ctx.adapt = when_db => new Proxy(when_db, _when_map_pxy_)
+
+  const key = opt_ctx.key
+  for await let db of aiter_when_update(when_db, opt_ctx) ::
+    let result = await opt_ctx.update(db, key)
+    if key :: result = when_db.set(key, result)
+    yield result
+
+export async function when_call(when_db, opt_ctx={}) ::
+  for await let r of aiter_when_call(when_db, opt_ctx) ::
+    if ! opt_ctx.until_done ::
+      return r
+

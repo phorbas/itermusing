@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang='en-US' class='wa-dark'>
+<head>
+  <meta charset='utf-8' />
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <title>Itermusing</title>
+
+  <link rel=icon href='data:image/png;base64,' />
+  <style>
+    /* Theme: webawesome.css or native.css */
+    @import url("https://early.webawesome.com/webawesome@3.0.0-alpha.10/dist/styles/webawesome.css") layer(wa);
+
+    /* Theme: default.css or awesome.css or classic.css */
+    @import url("https://early.webawesome.com/webawesome@3.0.0-alpha.10/dist/styles/themes/default.css") layer(theme);
+
+    /* Itermusing web component defaults */
+    @layer itm {
+      iter-musing { display: none; }
+      it-m { display: block; }
+    }
+
+    @layer reset, wa, theme, itm;
+  </style>
+
+  <script type=module crossorigin src="https://early.webawesome.com/webawesome@3.0.0-alpha.10/dist/webawesome.loader.js"></script>
+</head>
+<body>
+
+<script type=module>
+import {when_map} from './esm/itm_when.js'
+import {when_call, aiter_when_call} from './esm/itm_observe.js'
+
+const swh = when_map()
+swh.subscribe((key, value) => console.log('KV!', {key, value}))
+
+/*
+async function alog(key, when_db, fn_exec) {
+  for await (let value of aiter_apply_when(fn_exec, when_db, {key})) {
+    console.group("AITER Apply When")
+    console.log('result:', value)
+    console.log('SWH:', Object.fromEntries(swh.entries()))
+    console.groupEnd()
+  }
+}
+*/
+Object.assign(window, { when_map, when_call, swh })
+
+
+swh.set('aaa', 'This is AAA')
+
+when_call(swh, {
+  key: 'neato',
+  as_proxy: true,
+  until_done: true,
+  async update(pxy, name) {
+    console.log('Compute NEATO! %o', name)
+    let a = await pxy.aaa
+    let b = await pxy.bbb
+    let c = await pxy.ccc
+    return JSON.stringify({name, a, b, c})
+  },
+})
+
+when_call(swh, {
+  key: 'neato_keen',
+  until_done: true,
+  async update(ns, name) {
+    console.log('Compute NEATO_KEEN! %o', name)
+    let a = await ns.when('aaa')
+    let b = await ns.when('bbb')
+    let c = await ns.when('ccc')
+    return JSON.stringify({name, a, b, c})
+  },
+})
+
+
+swh.set('bbb', ['BBB', 'is', 'an', 'array'])
+swh.set('ccc', {ccc_value: 1942})
+
+console.log('End', Object.fromEntries(swh.entries()))
+</script>

@@ -4,6 +4,8 @@ import rpi_dgnotify from 'rollup-plugin-dgnotify'
 
 const entrypoints = [
   'code/itermusing.jsy',
+  'code/itm_when.jsy',
+  'code/itm_observe.jsy',
 ]
 const mock_entrypoints = [
   'mock/itm_wa_views.jsy',

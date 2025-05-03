@@ -1,15 +1,19 @@
-import { ItmView } from './itm_view.jsy'
-import { ItermusingRoot } from './itm_root.jsy'
+import { ItmCore, ItmView, ItermusingRoot } from './itm_components.jsy'
 import { bkc_itm_store } from './itm_store.jsy'
 
-const import_opt = new URL(import.meta.url).searchParams
-if import_opt.has('boot') ::
-  customElements.define @ 'iter-musing',
-    class extends ItermusingRoot ::
-      stg = bkc_itm_store(this)
-      viewmap = new Map()
+export * from './itm_utils.jsy'
+export * from './itm_import.jsy'
+export * from './itm_components.jsy'
+export * from './itm_store.jsy'
 
-  customElements.define @ 'it-m',
-    class extends ItmView ::
-
+::
+  const _use_opt = new URL(import.meta.url).searchParams
+  if _use_opt.has('boot') ::
+    customElements.define @ 'iter-musing',
+      class extends ItermusingRoot ::
+        stg = bkc_itm_store(this)
+    customElements.define @ 'it-d',
+      class extends ItmCore ::
+    customElements.define @ 'it-v',
+      class extends ItmView ::
 

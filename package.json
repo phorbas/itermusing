@@ -26,12 +26,11 @@
     "@phorbas/hamt": "file:../hamt",
     "@phorbas/opaque": "file:../opaque",
     "@phorbas/store": "file:../store",
-    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.1",
     "imm-dom": "^0.3.10",
-    "rollup": "^4.34.9",
-    "rollup-plugin-dgnotify": "^0.1.8",
-    "rollup-plugin-jsy": "^1.9.2",
-    "vite": "^6.2.0"
+    "rollup": "^4.40.1",
+    "rollup-plugin-jsy": "^1.9.4",
+    "vite": "^6.3.4"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./esm ./esm-mock",

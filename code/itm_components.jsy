@@ -1,0 +1,63 @@
+import { itm_context } from './itm_context.jsy'
+import { itm_import_attrs , import_at } from './itm_import.jsy'
+import { itm_dynamic } from './itm_dynamic.jsy'
+import { imm_on } from 'imm-dom'
+
+
+export class ItmCore extends HTMLElement ::
+  _ctx_ = itm_context
+  async connectedCallback() ::
+    this.abort_ctl?.abort('conn')
+    let abort_ctl = this.abort_ctl = new AbortController()
+    try ::
+      let ctx = await @ this.ctx ??= this._itm_init(abort_ctl)
+      this.ctx = ctx
+      if ! abort_ctl.signal.aborted ::
+        await this._itm_conn?.(ctx, abort_ctl)
+        await ctx?.wc_connect?.(abort_ctl)
+    catch err ::
+      abort_ctl.abort('err:'+err)
+      throw err
+
+  async _itm_init(abort_ctl) ::
+    let ctx = this._ctx_.with({wc: this})
+    ctx = await this._itm_ctx?.(ctx, abort_ctl) ?? ctx
+    this.ctx = ctx
+
+    for let [attr, import_url] of itm_import_attrs(this) ::
+      let module = await ctx.import_at(import_url)
+      ctx = await this._itm_extend(ctx, module) ?? ctx
+    this.ctx = ctx
+
+    return ctx
+
+  _itm_extend(ctx, module) :: return module.itm_init?.(ctx)
+  // _itm_ctx(ctx) ::
+
+  disconnectedCallback() ::
+    let ctx = this.ctx
+    this.abort_ctl?.abort('dis')
+    this.ctx = null
+    return ctx?.wc_disconnect?.()
+
+
+export class ItmView extends ItmCore ::
+  _ctx_ = itm_dynamic
+
+
+export class ItermusingRoot extends ItmCore ::
+  async _itm_ctx(ctx, {signal}) ::
+    ctx.viewmap = this.viewmap ??= new Map()
+    ctx.stg = await this.stg
+
+    imm_on @ this.parentNode,
+      @{} 
+        itm_stg(evt) :: evt.detail.stg = ctx.stg
+        itm_mime(evt) :: evt.detail.push(ctx.viewmap)
+      {signal}
+      
+  async _itm_init(abort_ctl) ::
+    let ctx = await super._itm_init(abort_ctl)
+    ctx.cfg_impulse(1)
+    return ctx
+

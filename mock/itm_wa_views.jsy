@@ -5,10 +5,10 @@ const _view_dbg = msg => (_, {mime, key, h}) =>
 
 
 const _mock_webawesome_views = @{}
-  absent: (content, {h, wc_host}) => 
+  absent: (content, {h, wc}) => 
     h.pre @: 
       class: 'wa-callout wa-warning'
-      $: `view not found: ${wc_host.outerHTML}`
+      $: `view not found: ${wc.outerHTML}`
 
   'text/plain': async (content, {h}) =>
     !content ? null :
@@ -19,10 +19,11 @@ const _mock_webawesome_views = @{}
       h.div @: '=innerHTML': await content.text()
 
 
-export async function itm_root({viewmap}) ::
-  console.log @ 'MOCK VIEWS'
+export async function itm_init(ctx) ::
+  console.log @ 'MOCK VIEWS', ctx
 
   for let [k,v] of Object.entries(_mock_webawesome_views) ::
-    viewmap.set(k,v)
-  console.log @ 'Registered Viewmap:', viewmap
+    ctx.viewmap.set(k,v)
+
+  console.log @ 'Registered Viewmap:', ctx.viewmap
 

@@ -1,0 +1,42 @@
+import { itm_context, itm_disco } from './itm_context.jsy'
+
+export const itm_dynamic = @{}
+  __proto__: itm_context
+
+  find_mime_view(mime) ::
+    for let viewmap of itm_disco(this.wc, 'itm_mime', []) ::
+      if viewmap ::
+        let view = viewmap.find_mime_view?.(mime) 
+        view ??= viewmap.get(mime)
+        if view :: return view
+
+    if mime.includes('/') ::
+      return this.find_mime_view('absent')
+
+  // wc_disconnect() ::
+  async wc_connect({signal}) ::
+    let wc = this.wc
+    let el = await this.render_view()
+    wc.textContent = ''
+    wc.append(el)
+
+  async load_content() ::
+    return this.content ??= await this.fetch_content @
+      this.wc.getAttribute('k'), this.wc.getAttribute('mime')
+
+  async render_view() ::
+    let content = await this.load_content()
+
+    let view_fn = this.view_for
+      ?? this.find_mime_view(this.wc.getAttribute('mime'))
+      ?? this.view_absent
+    return view_fn.call(this, content, this)
+
+  view_absent(content) ::
+    let el_absent = this.h.pre @: 
+      class: 'wa-callout wa-warning'
+      $: `[[ view not found: ${this.wc.outerHTML} ]]`
+    console.warn(el_absent.textContent, content)
+    return el_absent
+
+

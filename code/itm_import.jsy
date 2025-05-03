@@ -1,33 +1,29 @@
 import {itm_attrs} from './itm_utils.jsy'
 
-let _cache = new Map()
-export async function import_at(stg, url_or_key, opt) ::
-  if /^[0-9a-fA-F]+$/.test(url_or_key) ::
-    url_or_key = 'bkc:'+url_or_key
-
-  url_or_key = new URL(url_or_key, opt?.base_url ?? globalThis.location)
-
-  switch url_or_key.protocol ::
-    case 'http:': case 'https:':
-      return await import(/* @vite-ignore */ url_or_key, {... opt})
-
-    case 'bkc:': ::
-      let dyn_url = _cache.get(url_or_key)
-      if undefined === dyn_url ::
-        stg = await stg
-        let ab = await stg.bkc_fetch(url_or_key.pathname, {signal: opt?.signal})
-        if ! ab :: return null
-
-        dyn_url = URL.createObjectURL( new Blob([ab], {type: 'text/javascript'}) )
-        _cache.set(url_or_key, dyn_url ?? null)
-
-      return await import(/* @vite-ignore */ dyn_url, {... opt})
-
-  if url_or_key ::
-
 
 const _rx_dep = /^dep(?:-\w+)?/, _rx_init = /^init(?:-\w+)?/
-export async function * itm_import_attrs(elem, stg) ::
-  for let [attr, module_url] of itm_attrs(elem, _rx_dep, _rx_init) ::
-    yield [attr, import_at(stg, module_url), module_url]
+export const itm_import_attrs = elem =>
+  itm_attrs(elem, _rx_dep, _rx_init)
+
+
+export async function import_at(stg, url_or_key, opt) ::
+  url_or_key = new URL(url_or_key, opt?.base_url ?? globalThis.location)
+
+  if 'bkc:' === url_or_key.protocol ::
+    url_or_key = await bkc_as_import_url(stg, url_or_key, opt)
+
+  return await import(/* @vite-ignore */ url_or_key, {... opt})
+
+
+const _bkc_cache = new Map()
+export async function bkc_as_import_url(stg, bkckey, opt) ::
+  let dyn_url = _bkc_cache.get(bkckey)
+  if undefined === dyn_url ::
+    stg = await stg
+    let ab = await stg.bkc_fetch(bkckey.pathname, {signal: opt?.signal})
+    if ! ab :: return null
+
+    dyn_url = URL.createObjectURL( new Blob([ab], {type: 'text/javascript'}) )
+    _bkc_cache.set(bkckey, dyn_url ?? null)
+  return dyn_url
 

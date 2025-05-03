@@ -1,0 +1,50 @@
+import { import_at } from './itm_import.jsy'
+
+import { imm, imm_set, imm_html, imm_wcemit } from 'imm-dom'
+export { imm, imm_set, imm_html, imm_wcemit } from 'imm-dom'
+
+
+export const itm_disco = (el, evt, collect={}) =>
+  (imm_wcemit(el, evt, collect), collect)
+
+
+let _cfg_p
+export const itm_context = @{}
+  __proto__: null
+  with(kw, kw2) :: return {__proto__: this, ...kw, ...kw2}
+
+  imm, imm_set, imm_html, h: imm_html,
+
+  async find_stg() ::
+    let stg = this.stg, wc=this.wc, signal=wc.signal
+    while ! stg && ! signal?.aborted ::
+      stg = itm_disco(wc, 'itm_stg').stg
+      if ! stg :: await this.cfg_impulse()
+
+    return this.stg = stg
+
+  cfg_impulse(trigger) ::
+    if ! trigger ::
+      return (_cfg_p ??= Promise.withResolvers()).promise
+
+    let p = _cfg_p
+    _cfg_p = null
+    p?.resolve()
+
+
+  async fetch_content(url_or_key, mime, fetch_opt) ::
+    url_or_key = new URL(url_or_key, 'bkc:')
+
+    let signal=this.wc.signal
+    if 'bkc:' === url_or_key.protocol ::
+      let stg = this.stg ?? await this.find_stg()
+      let ab = await stg.bkc_fetch(url_or_key.pathname, signal)
+      return mime && ab ? new Blob([ab], {type: mime}) : ab
+
+    return await fetch(url_or_key, {signal, ...fetch_opt})
+
+
+  async import_at(url_or_key, opt) ::
+    let stg = this.stg ?? await this.find_stg()
+    return import_at(stg, url_or_key, opt)
+

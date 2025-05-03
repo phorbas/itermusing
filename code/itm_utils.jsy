@@ -1,12 +1,3 @@
-import { imm_raf } from 'imm-dom'
-import { imm, imm_set, imm_html } from 'imm-dom'
-export { imm_raf, imm, imm_set, imm_html, imm_html as h }
-
-export const _itm_ctx_ = @{}
-  with(kw, kw2) :: return {__proto__: this, ...kw, ...kw2}
-
-  imm_raf, imm, imm_set, imm_html, h: imm_html,
-
 
 const _as_attr_match = test => test.call ? test
   : test.exec ? attr => test.exec(attr)
@@ -24,4 +15,5 @@ export function * itm_attrs(elem, test, test_init) ::
       let res = [attr, elem.getAttribute(attr)]
       if init :: elem.removeAttribute(attr)
       yield res
+
 

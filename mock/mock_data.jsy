@@ -1,7 +1,8 @@
 import { opaque_basic as opaque } from '@phorbas/opaque'
 
-export async function itm_root({stg, h}) ::
-  console.log @ 'MOCK DATA'
+export async function itm_init(ctx) ::
+  console.log @ 'MOCK DATA', ctx
+  const {stg, h} = ctx
 
   async function _store_new(content) ::
     let hk21 = await opaque.from_content(content)
@@ -29,8 +30,8 @@ export async function itm_root({stg, h}) ::
     import "https://md-block.verou.me/md-block.js"
     console.log("Registered md-block!")
 
-    export const itm_view = view_logic =>
-      view_logic.with({
+    export const itm_init = ctx_view =>
+      ctx_view.with({
         view_for: async (content, {h}) =>
           h.md_block('' + await content.text()),
       })
@@ -41,5 +42,4 @@ export async function itm_root({stg, h}) ::
     hk1_markdown
     hk1_md_view
 
-  return stg
 

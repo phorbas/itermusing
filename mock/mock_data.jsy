@@ -1,6 +1,6 @@
 import { opaque_basic as opaque } from '@phorbas/opaque'
 
-export async function itm_init(ctx) ::
+export async function itermuse(ctx) ::
   console.log @ 'MOCK DATA', ctx
   const {stg, h} = ctx
 
@@ -8,7 +8,7 @@ export async function itm_init(ctx) ::
     let hk21 = await opaque.from_content(content)
     await stg.bkc_store(hk21[1], hk21.buf)
     let rt_buf = await stg.bkc_fetch(hk21[1])
-    return hk21[1]
+    return `bkc:${hk21[1]}`
 
   let hk1_hello = await _store_new @
     'hello there boot!'
@@ -26,20 +26,33 @@ export async function itm_init(ctx) ::
     This is some markdown content
     `
 
+  let hk1_md_other = await _store_new @ `\
+    # Salut
+    Markdown again
+    `
+
   let hk1_md_view = await _store_new @ `\
     import "https://md-block.verou.me/md-block.js"
     console.log("Registered md-block!")
 
-    export const itm_init = ctx_view =>
-      ctx_view.with({
-        view_for: async (content, {h}) =>
-          h.md_block('' + await content.text()),
+    export function itermuse(ctx_view) {
+      ctx_view.view_for = async (content, {h}) =>
+        h.md_block('' + await content.text())
+    }
+    `
+
+  let hk1_amazing = await _store_new @ `\
+    export const itermuse = ctx => ctx.with({
+        view_for: (_, {h}) => h.h2('Amazing!'),
       })
     `
+
   console.log @:
     hk1_hello
     hk1_html
     hk1_markdown
+    hk1_md_other
     hk1_md_view
+    hk1_amazing
 
 

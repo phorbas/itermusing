@@ -1,7 +1,7 @@
 import { import_at } from './itm_import.jsy'
 
-import { imm, imm_set, imm_html, imm_wcemit } from 'imm-dom'
-export { imm, imm_set, imm_html, imm_wcemit } from 'imm-dom'
+import { imm, imm_set, imm_on, imm_html, imm_wcemit } from 'imm-dom'
+export { imm, imm_set, imm_on, imm_html, imm_html as h, imm_wcemit } from 'imm-dom'
 
 
 export const itm_disco = (el, evt, collect={}) =>
@@ -32,6 +32,10 @@ export const itm_context = @{}
     p?.resolve()
 
 
+  async load_content() ::
+    return this.content ??= await this.fetch_content @
+      this.wc.getAttribute('k'), this.wc.getAttribute('mime')
+
   async fetch_content(url_or_key, mime, fetch_opt) ::
     url_or_key = new URL(url_or_key, 'bkc:')
 
@@ -39,7 +43,7 @@ export const itm_context = @{}
     if 'bkc:' === url_or_key.protocol ::
       let stg = this.stg ?? await this.find_stg()
       let ab = await stg.bkc_fetch(url_or_key.pathname, signal)
-      return mime && ab ? new Blob([ab], {type: mime}) : ab
+      return new Blob([ab], {type: mime})
 
     return await fetch(url_or_key, {signal, ...fetch_opt})
 

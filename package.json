@@ -27,6 +27,7 @@
     "@phorbas/opaque": "file:../opaque",
     "@phorbas/store": "file:../store",
     "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
     "imm-dom": "^0.3.10",
     "rollup": "^4.40.1",
     "rollup-plugin-jsy": "^1.9.4",

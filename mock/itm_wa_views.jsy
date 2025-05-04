@@ -1,28 +1,19 @@
-const _view_dbg = msg => (_, {mime, key, h}) =>
-  h.pre @: 
-    class: 'wa-callout wa-warning'
-    $: `${msg}: ${mime} ${key}`
+const _mock_views = @{}
+  async 'text/plain'(content, {h}) ::
+    if content ::
+      return h.pre @
+        `${await content.text()}`
+
+  async 'text/html'(content, {h}) ::
+    if content ::
+      return h.div @:
+        '=innerHTML': await content.text()
 
 
-const _mock_webawesome_views = @{}
-  absent: (content, {h, wc}) => 
-    h.pre @: 
-      class: 'wa-callout wa-warning'
-      $: `view not found: ${wc.outerHTML}`
-
-  'text/plain': async (content, {h}) =>
-    !content ? null :
-      h.pre @ `${await content.text()}`
-
-  'text/html': async (content, {h}) =>
-    !content ? null :
-      h.div @: '=innerHTML': await content.text()
-
-
-export async function itm_init(ctx) ::
+export async function itermuse(ctx) ::
   console.log @ 'MOCK VIEWS', ctx
 
-  for let [k,v] of Object.entries(_mock_webawesome_views) ::
+  for let [k,v] of Object.entries(_mock_views) ::
     ctx.viewmap.set(k,v)
 
   console.log @ 'Registered Viewmap:', ctx.viewmap

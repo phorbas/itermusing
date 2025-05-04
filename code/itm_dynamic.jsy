@@ -13,16 +13,14 @@ export const itm_dynamic = @{}
     if mime.includes('/') ::
       return this.find_mime_view('absent')
 
-  // wc_disconnect() ::
   async wc_connect({signal}) ::
     let wc = this.wc
     let el = await this.render_view()
-    wc.textContent = ''
+    wc.textContent = '' // clear
     wc.append(el)
 
-  async load_content() ::
-    return this.content ??= await this.fetch_content @
-      this.wc.getAttribute('k'), this.wc.getAttribute('mime')
+  wc_disconnect() ::
+    this.wc.textContent = '' // clear
 
   async render_view() ::
     let content = await this.load_content()

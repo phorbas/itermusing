@@ -1,8 +1,10 @@
 import rpi_node_resolve from '@rollup/plugin-node-resolve'
+import rpi_terser from '@rollup/plugin-terser'
 import rpi_jsy from 'rollup-plugin-jsy'
 
 const entrypoints = [
   'code/itermusing.jsy',
+  'code/index.jsy',
 ]
 const mock_entrypoints = [
   'mock/itm_wa_views.jsy',
@@ -20,7 +22,10 @@ export const external = [
 
 export default [
   {
-    output: { format: 'es', dir: 'esm/', sourcemap: true },
+    output: [
+      { format: 'es', dir: 'esm/', sourcemap: true },
+      { format: 'es', dir: 'esm/', plugins: [rpi_terser()], entryFileNames: '[name].min.js' },
+    ],
     external, plugins: _rpis_(),
     input: entrypoints
   },

@@ -54,7 +54,7 @@ export class ItmView extends ItmCore ::
 export class ItmRoot extends ItmCore ::
   async _itm_ctx(ctx, {signal}) ::
     ctx.viewmap = this.viewmap ??= new Map()
-    ctx.stg = await this.stg
+    ctx.stg = this.stg = await this.stg
 
     imm_on @ this.parentNode,
       @{} 

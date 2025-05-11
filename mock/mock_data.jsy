@@ -6,9 +6,10 @@ export async function itermuse(ctx) ::
 
   async function _store_new(content) ::
     let hk21 = await opaque.from_content(content)
-    await stg.bkc_store(hk21[1], hk21.buf)
-    let rt_buf = await stg.bkc_fetch(hk21[1])
-    return `bkc:${hk21[1]}`
+    let key = `bkc:/dom/${hk21[1]}`
+    await stg.bkc_store(key, hk21.buf)
+    //let rt_buf = await stg.bkc_fetch(key)
+    return key
 
   let hk1_hello = await _store_new @
     'hello there boot!'

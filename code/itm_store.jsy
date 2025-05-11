@@ -1,9 +1,16 @@
-import { bkc_storage_verify, bkc_extend, bkc_multi } from '@phorbas/store/esm/xform/bkc_multi.js'
+//import { bkc_storage_verify, bkc_extend, bkc_multi } from '@phorbas/store/esm/xform/index.js'
+import { bkc_multi_path } from '@phorbas/store/esm/xform/index.js'
 import { bkc_web_dom } from '@phorbas/store/esm/web/web_dom.js'
-//import { bkc_web_db } from '@phorbas/store/esm/web/web_db.js'
+import { WhenMap } from 'whenmap'
 
 export async function bkc_itm_store(elem_db_boot) ::
-  let bkc_boot = bkc_web_dom(elem_db_boot)
-  return bkc_storage_verify @
-    bkc_extend @ bkc_boot, @{}
+  let by_path = new WhenMap()
 
+  by_path.set @ 'dom', bkc_web_dom(elem_db_boot)
+
+  let stg = await bkc_multi_path @
+    @[] new URLPattern('bkc:/:stg/:key', 'bkc:')
+    @{} by_path
+
+  stg.by_path = by_path
+  return stg

@@ -1,10 +1,12 @@
-import { ItmCore, ItmView, ItmRoot, bkc_itm_store } from './index.jsy'
+import { ItmCore, ItmView, ItmRoot } from './itm_components.jsy'
+import { kbc_itm_store, WhenMap } from './itm_store.jsy'
 
 ::
   let C = customElements
   C.define @ 'iter-musing',
     class extends ItmRoot ::
-      stg = bkc_itm_store(this)
+      stg = kbc_itm_store(this)
+      mimeview = new WhenMap()
 
   C.define @ 'it-d', ItmCore
   C.define @ 'it-v', ItmView

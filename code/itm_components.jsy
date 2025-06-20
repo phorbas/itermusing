@@ -1,5 +1,4 @@
-import { itm_context, imm_on, h } from './itm_context.jsy'
-import { itm_import_attrs , import_at } from './itm_import.jsy'
+import { itm_context, itm_root } from './itm_context.jsy'
 import { itm_dynamic } from './itm_dynamic.jsy'
 
 
@@ -8,62 +7,100 @@ export class ItmCore extends HTMLElement ::
 
   async connectedCallback() ::
     this.abort_ctl?.abort('conn')
-    let abort_ctl = this.abort_ctl = new AbortController()
+    this.signal = (this.abort_ctl = new AbortController()).signal
     try ::
-      let ctx = await @ this.ctx ??= this._itm_init(abort_ctl)
-      if ! abort_ctl.signal.aborted ::
-        await this._itm_conn?.(ctx, abort_ctl)
-        await ctx?.wc_connect?.(abort_ctl)
+      let ctx = this.ctx = await @ this.ctx ??= this._itm_init()
+      if ! this.signal.aborted ::
+        await this._itm_conn?.(ctx)
+        await ctx?.wc_connect?.()
     catch err ::
-      abort_ctl.abort('err:'+err)
+      this.abort_ctl.abort('err:'+err)
       throw err
 
-  async _itm_init(abort_ctl) ::
-    let ctx = this._ctx_.with({wc: this})
-    ctx = await this._itm_ctx?.(ctx, abort_ctl) ?? ctx
+  async _itm_init() ::
+    let ctx = await this._ctx_.with({wc: this})
+    ctx = await this._itm_import(ctx)
+    return ctx
 
-    for let [attr, import_url] of itm_import_attrs(this) ::
+  async _itm_import(ctx) ::
+    for let [attr, import_url] of _itm_import_attrs(this) ::
       let module = await ctx.import_at(import_url)
-      ctx = await this._itm_extend(ctx, module) ?? ctx
-
-    return this.ctx = ctx
-
+      if module ::
+        ctx = await this._itm_extend(ctx, module) ?? ctx
+    return ctx
   _itm_extend(ctx, module) :: return module.itermuse?.(ctx)
-  // _itm_ctx(ctx) ::
+
 
   disconnectedCallback() ::
     let ctx = this.ctx
-    this.abort_ctl?.abort('dis')
+    this.abort_ctl.abort('dis')
     this.ctx = null
     return ctx?.wc_disconnect?.()
 
   itm_reload() ::
-    if ! this.isConnected ::
-      return false
+    if this.isConnected ::
+      // use a proxy dom element
+      let pxy = this.ownerDocument.createElement('del')
+      this.replaceWith(pxy) // invoke disconnected
+      pxy.replaceWith(this) // invoke connected
+      return true
+    return false
 
-    let pxy = h.del() // use a proxy dom element
-    this.replaceWith(pxy) // invoke disconnected
-    pxy.replaceWith(this) // invoke connected
-    return true
+  itm_dbg() ::
+    console.log @ 'itm_root has stg?', this.ctx.itm_disco('itm_stg',[])
+    console.log @ 'itm_root has mime?', this.ctx.itm_disco('itm_mime',[])
 
+
+
+/////////////////////////////////////////
+// ItmView provides an extended context prototype for DOM rendering
 
 export class ItmView extends ItmCore ::
   _ctx_ = itm_dynamic
 
+  render(...args) ::
+    this.textContent = ''
+    this.append(... args)
+
+/////////////////////////////////////////
+// ItmRoot provides storage and mimeview roots
 
 export class ItmRoot extends ItmCore ::
-  async _itm_ctx(ctx, {signal}) ::
-    ctx.viewmap = this.viewmap ??= new Map()
-    ctx.stg = this.stg = await this.stg
+  _ctx_ = itm_root
 
-    imm_on @ this.parentNode,
-      @{} 
-        itm_stg(evt) :: evt.detail.stg = ctx.stg
-        itm_mime(evt) :: evt.detail.push(ctx.viewmap)
-      {signal}
-      
-  async _itm_init(abort_ctl) ::
-    let ctx = await super._itm_init(abort_ctl)
-    ctx.cfg_impulse(1)
+  async _itm_init() ::
+    this.stg = await this.stg
+    let ctx = this._ctx_.with @:
+      wc: this, stg: this.stg, mimeview: this.mimeview
+
+    ctx = await this._itm_import(ctx)
     return ctx
+      
+  async _itm_conn(ctx) ::
+    let el_parent = this.parentNode
+    let evt_opt = @{} signal: this.signal, passive: true
+    el_parent.addEventListener @ 'itm_stg',
+      evt => :: evt.detail.push(ctx.stg)
+      evt_opt
+
+    el_parent.addEventListener @ 'itm_mime',
+      evt => :: evt.detail.push(ctx.mimeview)
+      evt_opt
+
+    this.dispatchEvent @
+      new CustomEvent('itm_root', {bubbles: true})
+
+
+
+/////////////////////////////////////////
+// Import via element attributes
+
+const _rx_dep = /^dep(?:-\w+)?/, _rx_init = /^init(?:-\w+)?/
+function * _itm_import_attrs(elem, test, test_init) ::
+  for let attr of elem.getAttributeNames() ::
+    let init = _rx_init.test(attr)
+    if init || _rx_dep.test(attr) ::
+      let val = elem.getAttribute(attr)
+      if init :: elem.removeAttribute(attr)
+      yield [attr, val]
 

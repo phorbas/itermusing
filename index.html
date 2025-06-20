@@ -8,21 +8,30 @@
   <link rel=icon href='data:image/png;base64,' />
   <style>
     /* Theme: webawesome.css or native.css */
-    @import url("https://early.webawesome.com/webawesome@3.0.0-alpha.12/dist/styles/webawesome.css") layer(wa);
+    @import url("https://early.webawesome.com/webawesome@3.0.0-alpha.13/dist/styles/webawesome.css") layer(wa);
 
     /* Theme: default.css or awesome.css or classic.css */
-    @import url("https://early.webawesome.com/webawesome@3.0.0-alpha.12/dist/styles/themes/default.css") layer(theme);
+    @import url("https://early.webawesome.com/webawesome@3.0.0-alpha.13/dist/styles/themes/default.css") layer(theme);
 
     /* Itermusing web component defaults */
     @layer itm {
       iter-musing, it-d { display: none; }
       it-v { display: block; }
+      .itm-loading {
+        color: gray;
+        &:before { content: '[[ ' }
+        &:after { content: ' ]]' }
+      }
     }
 
     @layer reset, wa, theme, itm;
+
+    it-v {
+      padding: 0.5rem;
+    }
   </style>
 
-  <script type=module crossorigin src="https://early.webawesome.com/webawesome@3.0.0-alpha.10/dist/webawesome.loader.js"></script>
+  <script type=module crossorigin src="https://early.webawesome.com/webawesome@3.0.0-alpha.13/dist/webawesome.loader.js"></script>
   <script type=module src='/esm/itermusing.js?boot'></script>
 </head>
 <body>
@@ -34,22 +43,29 @@
 
 <main>
   <h6>text/plain of HTML content</h6>
-  <it-v mime='text/plain' k='bkc:/dom/c7eb67d4ec9f66f79850e06a2b3baa5598b2333ea220ee792f80a5bee7c2b473'></it-v>
+  <it-v mime='text/plain' k="kbc:/dom/5651c81876eb346c3cc3ad98795c85e509ba7e68d431c6e8092a9e4ddb2601bf"></it-v>
 
   <h6>text/html</h6>
-  <it-v mime='text/html' k='bkc:/dom/c7eb67d4ec9f66f79850e06a2b3baa5598b2333ea220ee792f80a5bee7c2b473'></it-v>
-
+  <it-v mime='text/html' k="kbc:/dom/c7eb67d4ec9f66f79850e06a2b3baa5598b2333ea220ee792f80a5bee7c2b473"></it-v>
+ 
   <h6>text/plain of Markdown content</h6>
-  <it-v mime='text/plain' k='bkc:/dom/6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26'></it-v>
+  <it-v mime='text/plain' k="kbc:/dom/6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26"></it-v>
 
-  <h6>Rendered text/markdown content</h6>
-  <it-v mime='text/markdown' k='bkc:/dom/6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26'
-    dep='bkc:/dom/4ad06a159ae03be3ba7031385c6db529ad9fa47c6bf0b3cf508793a1f6f564f4' ></it-v>
+  <h6>dynamic renderer</h6>
+  <it-v dep="kbc:/dom/30ac8633495774fdcf08824a73274a065624db3db9d85a9f6b1e9b00bff7e8fa"></it-v>
 
-  <h6>Source of text/markdown view loader</h6>
-  <it-v mime='text/plain' k='bkc:/dom/4ad06a159ae03be3ba7031385c6db529ad9fa47c6bf0b3cf508793a1f6f564f4'></it-v>
+  <h6>Rendered md_block text/markdown content</h6>
+  <it-v mime='text/markdown' k="kbc:/dom/6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26"
+    dep="kbc:/dom/0a667330f5fabd6117f913396db0536b3e3e707a624d31910f74b41cc31924c7" ></it-v>
 
-  <it-v k='bkc:/dom/f45223e8bee2228efb293a01ccfa810d43c8bdf36d3641756ba1ebed14c7c515'
-    dep='bkc:/dom/4ad06a159ae03be3ba7031385c6db529ad9fa47c6bf0b3cf508793a1f6f564f4' ></it-v>
+  <h6>Source of md_block text/markdown view loader</h6>
+  <it-v mime='text/plain' k="kbc:/dom/0a667330f5fabd6117f913396db0536b3e3e707a624d31910f74b41cc31924c7"></it-v>
+
+  <h6>Rendered zero_md text/markdown content</h6>
+  <it-v mime='text/markdown' k="kbc:/dom/6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26"
+    dep="kbc:/dom/b1e6bf2cdd31e0ac7569128c964f5447bc9c04262c3b35a8bdc75cea2adce69d" ></it-v>
+
+  <h6>Source of zero_md text/markdown view loader</h6>
+  <it-v mime='text/plain' k="kbc:/dom/b1e6bf2cdd31e0ac7569128c964f5447bc9c04262c3b35a8bdc75cea2adce69d"></it-v>
+
 </main>
-

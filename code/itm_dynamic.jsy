@@ -1,40 +1,42 @@
-import { itm_context, itm_disco } from './itm_context.jsy'
+import { itm_context } from './itm_context.jsy'
 
 export const itm_dynamic = @{}
   __proto__: itm_context
 
-  find_mime_view(mime) ::
-    for let viewmap of itm_disco(this.wc, 'itm_mime', []) ::
-      if viewmap ::
-        let view = viewmap.find_mime_view?.(mime) 
-        view ??= viewmap.get(mime)
-        if view :: return view
+  async find_mime(mime=this.wc.getAttribute('mime')) ::
+    while 1 ::
+      let mimeview = this.itm_disco('itm_mime',[]).find(Boolean)
+      if mimeview ::
+        return mimeview.get(mime)
 
-    if mime.includes('/') ::
-      return this.find_mime_view('absent')
+      if ! await this.itm_disco_update() :: return
 
-  async wc_connect({signal}) ::
-    let wc = this.wc
-    let el = await this.render_view()
-    wc.textContent = '' // clear
-    wc.append(el)
+  async wc_connect() ::
+    let content = this.load_content()
+    this.render_loading(content)
+    await this.render_view(content)
 
   wc_disconnect() ::
-    this.wc.textContent = '' // clear
+    this.wc.textContent = '' // clear body
 
-  async render_view() ::
-    let content = await this.load_content()
+  async render_view(content) ::
+    let wc = this.wc
+    let view_fn = this.view_for ?? this.find_mime()
 
-    let view_fn = this.view_for
-      ?? this.find_mime_view(this.wc.getAttribute('mime'))
-      ?? this.view_absent
-    return view_fn.call(this, content, this)
+    if view_fn?.then :: view_fn = await view_fn
+    if ! view_fn ::
+      console.warn('view_fn not found', wc.getAttribute('mime'))
+      return this.render_absent(content)
 
-  view_absent(content) ::
-    let el_absent = this.h.pre @: 
-      class: 'wa-callout wa-warning'
-      $: `[[ view not found: ${this.wc.outerHTML} ]]`
-    console.warn(el_absent.textContent, content)
-    return el_absent
+    if ! wc.signal.aborted ::
+      let el = view_fn.call(this, content, this)
+      if el?.then :: el = await el
+      wc.textContent = ''
+      wc.append(el)
 
+  async render_loading(content) ::
+    let wc=this.wc, el=wc.ownerDocument.createElement('div')
+    el.classList.add('itm-loading')
+    el.append(`${wc.getAttribute('mime') || '??'} ${wc.getAttribute('k')}`)
+    wc.append(el)
 

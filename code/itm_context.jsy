@@ -1,54 +1,74 @@
-import { import_at } from './itm_import.jsy'
-
-import { imm, imm_set, imm_on, imm_html, imm_wcemit } from 'imm-dom'
-export { imm, imm_set, imm_on, imm_html, imm_html as h, imm_wcemit } from 'imm-dom'
-
-
-export const itm_disco = (el, evt, collect={}) =>
-  (imm_wcemit(el, evt, collect), collect)
-
-
-let _cfg_p
-export const itm_context = @{}
+export const itm_base = @{}
   __proto__: null
-  with(kw, kw2) :: return {__proto__: this, ...kw, ...kw2}
 
-  imm, imm_set, imm_html, h: imm_html,
+  with(kw) :: return {__proto__: this, ...kw}
+
+  itm_disco(evt, detail) ::
+    this.wc.dispatchEvent @ 
+      new CustomEvent(evt, { detail, composed: true, bubbles: true })
+    return detail
+
+  async itm_disco_update() ::
+    let wc=this.wc, signal=wc.signal, el_root=wc.ownerDocument.documentElement
+    await new Promise @ on_update =>
+      el_root.addEventListener @ 'itm_root', on_update,
+          { signal, once: true, passive:true }
+    return ! signal.aborted
+
 
   async find_stg() ::
     let stg = this.stg, wc=this.wc, signal=wc.signal
-    while ! stg && ! signal?.aborted ::
-      stg = itm_disco(wc, 'itm_stg').stg
-      if ! stg :: await this.cfg_impulse()
+    while ! stg ::
+      stg = this.itm_disco('itm_stg',[]).find(Boolean)
+      if stg :: return this.stg = stg
 
-    return this.stg = stg
+      if ! await this.itm_disco_update() :: return
+    return stg
 
-  cfg_impulse(trigger) ::
-    if ! trigger ::
-      return (_cfg_p ??= Promise.withResolvers()).promise
+  async kbc_fetch(kbckey, mime) ::
+    kbckey = kbckey.pathname ?? kbckey
+    let stg = this.stg ?? await this.find_stg()
 
-    let p = _cfg_p
-    _cfg_p = null
-    p?.resolve()
+    let ab = await stg.kbc_fetch(kbckey, {signal: this.wc.signal})
+    ab &&= new Blob([ab], {type: mime}) 
+    return ab
 
+
+  async import_at(ref, opt) ::
+    ref &&= new URL(ref, opt?.base_url ?? globalThis.location)
+
+    if 'kbc:' === ref?.protocol ::
+      let blob = await this.kbc_fetch(ref.pathname, 'text/javascript')
+      ref = blob ? URL.createObjectURL(blob) : null
+
+    if ref ::
+      let module = await import(/* @vite-ignore */ ref, {... opt})
+      return module
+
+
+
+export const itm_root = @{}
+  __proto__: itm_base
+  base: itm_base
+
+
+
+export const itm_context = @{}
+  __proto__: itm_base
+  base: itm_base
 
   async load_content() ::
     return this.content ??= await this.fetch_content @
       this.wc.getAttribute('k'), this.wc.getAttribute('mime')
 
-  async fetch_content(url_or_key, mime, fetch_opt) ::
-    url_or_key = new URL(url_or_key, 'bkc:')
+  async fetch_content(ref, mime, fetch_opt) ::
+    ref &&= new URL(ref, 'kbc:')
 
-    let signal=this.wc.signal
-    if 'bkc:' === url_or_key.protocol ::
-      let stg = this.stg ?? await this.find_stg()
-      let ab = await stg.bkc_fetch(url_or_key.pathname, signal)
-      return new Blob([ab], {type: mime})
+    if 'kbc:' === ref?.protocol ::
+      return await this.kbc_fetch(ref.pathname, mime)
 
-    return await fetch(url_or_key, {signal, ...fetch_opt})
-
-
-  async import_at(url_or_key, opt) ::
-    let stg = this.stg ?? await this.find_stg()
-    return import_at(stg, url_or_key, opt)
+    if ref ::
+      let resp = await fetch @ ref,
+        @{} signal: this.wc.signal, ...fetch_opt
+      return await resp
 

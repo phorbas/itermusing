@@ -1,20 +1,22 @@
-const _mock_views = @{}
-  async 'text/plain'(content, {h}) ::
-    if content ::
-      return h.pre @
-        `${await content.text()}`
+import {imm_html as h} from 'imm-dom'
 
-  async 'text/html'(content, {h}) ::
+const _mock_views = @{}
+  async 'text/plain'(content) ::
+    content = await (await content)?.text()
+    if content ::
+      return h.pre(`${content}`)
+
+  async 'text/html'(content) ::
+    content = await (await content)?.text()
     if content ::
       return h.div @:
-        '=innerHTML': await content.text()
+        '=innerHTML': content
 
 
 export async function itermuse(ctx) ::
-  console.log @ 'MOCK VIEWS', ctx
-
-  for let [k,v] of Object.entries(_mock_views) ::
-    ctx.viewmap.set(k,v)
-
-  console.log @ 'Registered Viewmap:', ctx.viewmap
+  console.group @ 'MOCK VIEWS'
+  for let [mime, view] of Object.entries(_mock_views) ::
+    ctx.mimeview.set(mime, view)
+    console.log @: mime, view
+  console.groupEnd()
 

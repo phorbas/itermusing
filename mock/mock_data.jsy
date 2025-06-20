@@ -1,14 +1,18 @@
 import { opaque_basic as opaque } from '@phorbas/opaque'
+import {imm_html as h} from 'imm-dom'
 
 export async function itermuse(ctx) ::
+  const stg = ctx.stg
+  ctx.base.h = h
+
   console.log @ 'MOCK DATA', ctx
-  const {stg, h} = ctx
 
   async function _store_new(content) ::
     let hk21 = await opaque.from_content(content)
-    let key = `bkc:/dom/${hk21[1]}`
-    await stg.bkc_store(key, hk21.buf)
-    //let rt_buf = await stg.bkc_fetch(key)
+    let key = `kbc:/dom/${hk21[1]}`
+    await stg.kbc_store(key, hk21.buf)
+    let rt_buf = await stg.kbc_fetch(key)
+    //console.log @# key, rt_buf, hk21
     return key
 
   let hk1_hello = await _store_new @
@@ -32,13 +36,29 @@ export async function itermuse(ctx) ::
     Markdown again
     `
 
-  let hk1_md_view = await _store_new @ `\
+  let hk1_zero_md_view = await _store_new @ `\
+    import "https://cdn.jsdelivr.net/npm/zero-md@3?register"
+    console.log("Registered zero-md!")
+
+    export function itermuse(ctx_view) {
+      ctx_view.view_for = async (content, {h}) => {
+        content = await (await content)?.text()
+        return h.zero_md(
+          h.script({
+            type: 'text/markdown',
+            $:'' + content}) )
+      }
+    }
+    `
+  let hk1_md_block_view = await _store_new @ `\
     import "https://md-block.verou.me/md-block.js"
     console.log("Registered md-block!")
 
     export function itermuse(ctx_view) {
-      ctx_view.view_for = async (content, {h}) =>
-        h.md_block('' + await content.text())
+      ctx_view.view_for = async (content, {h}) => {
+        content = await (await content)?.text()
+        return h.md_block('' + content)
+      }
     }
     `
 
@@ -48,12 +68,13 @@ export async function itermuse(ctx) ::
       })
     `
 
-  console.log @:
+  console.log @ 'MOCK DATA DONE', @{}
     hk1_hello
     hk1_html
+    hk1_amazing
     hk1_markdown
     hk1_md_other
-    hk1_md_view
-    hk1_amazing
+    hk1_md_block_view
+    hk1_zero_md_view
 
 

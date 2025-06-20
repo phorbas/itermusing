@@ -58,9 +58,6 @@ export class ItmCore extends HTMLElement ::
 export class ItmView extends ItmCore ::
   _ctx_ = itm_dynamic
 
-  render(...args) ::
-    this.textContent = ''
-    this.append(... args)
 
 /////////////////////////////////////////
 // ItmRoot provides storage and mimeview roots

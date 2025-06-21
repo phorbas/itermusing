@@ -19,17 +19,17 @@ export class ItmCore extends HTMLElement ::
 
   async _itm_init() ::
     let ctx = await this._ctx_.with({wc: this})
-    ctx = await this._itm_import(ctx)
+    ctx = await this._itm_import_attrs(ctx)
     return ctx
 
-  async _itm_import(ctx) ::
+  async _itm_import_attrs(ctx) ::
     for let [attr, import_url] of _itm_import_attrs(this) ::
-      let module = await ctx.import_at(import_url)
-      if module ::
-        ctx = await this._itm_extend(ctx, module) ?? ctx
+      ctx = await this._itm_import_at(ctx, attr, import_url)
     return ctx
-  _itm_extend(ctx, module) :: return module.itermuse?.(ctx)
 
+  async _itm_import_at(ctx, attr, import_url) ::
+    let module = await ctx.import_at(import_url)
+    return ctx = await module?.itermuse?.(ctx) ?? ctx
 
   disconnectedCallback() ::
     let ctx = this.ctx
@@ -50,6 +50,7 @@ export class ItmCore extends HTMLElement ::
     console.log @ 'itm_root has stg?', this.ctx.itm_disco('itm_stg',[])
     console.log @ 'itm_root has mime?', this.ctx.itm_disco('itm_mime',[])
 
+export {ItmCore as ItmModel}
 
 
 /////////////////////////////////////////
@@ -60,30 +61,32 @@ export class ItmView extends ItmCore ::
 
 
 /////////////////////////////////////////
-// ItmRoot provides storage and mimeview roots
+// ItmRoot publishes shared values: stg and mime
 
 export class ItmRoot extends ItmCore ::
   _ctx_ = itm_root
 
   async _itm_init() ::
-    this.stg = await this.stg
-    let ctx = this._ctx_.with @:
-      wc: this, stg: this.stg, mimeview: this.mimeview
+    let itm_pub = Object.entries(this.itm_pub)
+    let ctx = this._ctx_.with({wc: this, itm_pub})
 
-    ctx = await this._itm_import(ctx)
+    for let [attr, val] of itm_pub ::
+      ctx[attr] = val?.then ? await val : val
+
+    ctx = await this._itm_import_attrs(ctx)
+
+    let el_tgt=this.parentNode
+    for let [attr] of itm_pub ::
+      // itm_find_stg, itm_find_mime
+      console.log @ `itm_find_${attr}`
+      el_tgt.addEventListener @
+        `itm_find_${attr}`
+        evt => :: evt.detail.push(ctx[attr])
+        @{} signal: this.signal, passive: true
+
     return ctx
-      
-  async _itm_conn(ctx) ::
-    let el_parent = this.parentNode
-    let evt_opt = @{} signal: this.signal, passive: true
-    el_parent.addEventListener @ 'itm_stg',
-      evt => :: evt.detail.push(ctx.stg)
-      evt_opt
 
-    el_parent.addEventListener @ 'itm_mime',
-      evt => :: evt.detail.push(ctx.mimeview)
-      evt_opt
-
+  _itm_conn() ::
     this.dispatchEvent @
       new CustomEvent('itm_root', {bubbles: true})
 

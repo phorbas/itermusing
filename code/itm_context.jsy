@@ -3,10 +3,11 @@ export const itm_base = @{}
 
   with(kw) :: return {__proto__: this, ...kw}
 
-  itm_disco(evt, detail) ::
-    this.wc.dispatchEvent @ 
+  itm_disco(evt, list, fn=Boolean) ::
+    let detail = list ?? []
+    this.wc.dispatchEvent @
       new CustomEvent(evt, { detail, composed: true, bubbles: true })
-    return detail
+    return list ? detail.filter(fn) : detail.find(fn)
 
   async itm_disco_update() ::
     let wc=this.wc, signal=wc.signal, el_root=wc.ownerDocument.documentElement
@@ -19,7 +20,7 @@ export const itm_base = @{}
   async find_stg() ::
     let stg = this.stg, wc=this.wc, signal=wc.signal
     while ! stg ::
-      stg = this.itm_disco('itm_stg',[]).find(Boolean)
+      stg = this.itm_disco('itm_find_stg')
       if stg :: return this.stg = stg
 
       if ! await this.itm_disco_update() :: return
@@ -30,7 +31,7 @@ export const itm_base = @{}
     let stg = this.stg ?? await this.find_stg()
 
     let ab = await stg.kbc_fetch(kbckey, {signal: this.wc.signal})
-    ab &&= new Blob([ab], {type: mime}) 
+    ab &&= new Blob([ab], {type: mime})
     return ab
 
 

@@ -16,7 +16,7 @@
     /* Itermusing web component defaults */
     @layer itm {
       iter-musing, it-d { display: none; }
-      it-v { display: block; }
+      itm-v { display: block; }
       .itm-loading {
         color: gray;
         &:before { content: '[[ ' }
@@ -26,7 +26,7 @@
 
     @layer reset, wa, theme, itm;
 
-    it-v {
+    itm-v {
       padding: 0.5rem;
     }
   </style>
@@ -36,36 +36,40 @@
 </head>
 <body>
 
-<iter-musing
+<itm-root
   init-mock='/esm-mock/mock_data.js'
   dep-wa='/esm-mock/itm_wa_views.js'
-></iter-musing>
+></itm-root>
 
 <main>
+  <!--
+  <itm-root no-stg no-mime></itm-root>
+  -->
+
   <h6>text/plain of HTML content</h6>
-  <it-v mime='text/plain' k="kbc:/dom/5651c81876eb346c3cc3ad98795c85e509ba7e68d431c6e8092a9e4ddb2601bf"></it-v>
+  <itm-v mime='text/plain' k="kbc:/dom/5651c81876eb346c3cc3ad98795c85e509ba7e68d431c6e8092a9e4ddb2601bf"></itm-v>
 
   <h6>text/html</h6>
-  <it-v mime='text/html' k="kbc:/dom/c7eb67d4ec9f66f79850e06a2b3baa5598b2333ea220ee792f80a5bee7c2b473"></it-v>
+  <itm-v mime='text/html' k="kbc:/dom/c7eb67d4ec9f66f79850e06a2b3baa5598b2333ea220ee792f80a5bee7c2b473"></itm-v>
  
   <h6>text/plain of Markdown content</h6>
-  <it-v mime='text/plain' k="kbc:/dom/6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26"></it-v>
+  <itm-v mime='text/plain' k="kbc:/dom/6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26"></itm-v>
 
   <h6>dynamic renderer</h6>
-  <it-v dep="kbc:/dom/30ac8633495774fdcf08824a73274a065624db3db9d85a9f6b1e9b00bff7e8fa"></it-v>
+  <itm-v dep="kbc:/dom/30ac8633495774fdcf08824a73274a065624db3db9d85a9f6b1e9b00bff7e8fa"></itm-v>
 
   <h6>Rendered md_block text/markdown content</h6>
-  <it-v mime='text/markdown' k="kbc:/dom/6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26"
-    dep="kbc:/dom/0a667330f5fabd6117f913396db0536b3e3e707a624d31910f74b41cc31924c7" ></it-v>
+  <itm-v mime='text/markdown' k="kbc:/dom/6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26"
+    dep="kbc:/dom/0a667330f5fabd6117f913396db0536b3e3e707a624d31910f74b41cc31924c7" ></itm-v>
 
   <h6>Source of md_block text/markdown view loader</h6>
-  <it-v mime='text/plain' k="kbc:/dom/0a667330f5fabd6117f913396db0536b3e3e707a624d31910f74b41cc31924c7"></it-v>
+  <itm-v mime='text/plain' k="kbc:/dom/0a667330f5fabd6117f913396db0536b3e3e707a624d31910f74b41cc31924c7"></itm-v>
 
   <h6>Rendered zero_md text/markdown content</h6>
-  <it-v mime='text/markdown' k="kbc:/dom/6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26"
-    dep="kbc:/dom/b1e6bf2cdd31e0ac7569128c964f5447bc9c04262c3b35a8bdc75cea2adce69d" ></it-v>
+  <itm-v mime='text/markdown' k="kbc:/dom/6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26"
+    dep="kbc:/dom/b1e6bf2cdd31e0ac7569128c964f5447bc9c04262c3b35a8bdc75cea2adce69d" ></itm-v>
 
   <h6>Source of zero_md text/markdown view loader</h6>
-  <it-v mime='text/plain' k="kbc:/dom/b1e6bf2cdd31e0ac7569128c964f5447bc9c04262c3b35a8bdc75cea2adce69d"></it-v>
+  <itm-v mime='text/plain' k="kbc:/dom/b1e6bf2cdd31e0ac7569128c964f5447bc9c04262c3b35a8bdc75cea2adce69d"></itm-v>
 
 </main>

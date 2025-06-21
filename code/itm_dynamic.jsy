@@ -5,7 +5,7 @@ export const itm_dynamic = @{}
 
   async find_mime(mime=this.wc.getAttribute('mime')) ::
     while 1 ::
-      let mimeview = this.itm_disco('itm_mime',[]).find(Boolean)
+      let mimeview = this.itm_disco('itm_find_mime')
       if mimeview ::
         return mimeview.get(mime)
 

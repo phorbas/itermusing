@@ -1,13 +1,14 @@
-import { ItmCore, ItmView, ItmRoot } from './itm_components.jsy'
+import { ItmModel, ItmView, ItmRoot } from './itm_components.jsy'
 import { kbc_itm_store, WhenMap } from './itm_store.jsy'
 
 ::
   let C = customElements
-  C.define @ 'iter-musing',
+  C.define @ 'itm-root',
     class extends ItmRoot ::
-      stg = kbc_itm_store(this)
-      mimeview = new WhenMap()
+      itm_pub = @{}
+        stg: this.hasAttribute('no-stg') ? null : kbc_itm_store(this)
+        mime: this.hasAttribute('no-mime') ? null : new WhenMap()
 
-  C.define @ 'it-d', ItmCore
-  C.define @ 'it-v', ItmView
+  C.define @ 'itm-m', class extends ItmModel {}
+  C.define @ 'itm-v', class extends ItmView {}
 

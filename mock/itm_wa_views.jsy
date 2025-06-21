@@ -16,7 +16,7 @@ const _mock_views = @{}
 export async function itermuse(ctx) ::
   console.group @ 'MOCK VIEWS'
   for let [mime, view] of Object.entries(_mock_views) ::
-    ctx.mimeview.set(mime, view)
+    ctx.mime.set(mime, view)
     console.log @: mime, view
   console.groupEnd()
 

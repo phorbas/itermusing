@@ -5,7 +5,7 @@ export const itm_dynamic = @{}
 
   async find_mime(mime=this.wc.getAttribute('mime')) ::
     while 1 ::
-      let mimeview = this.itm_disco('itm_find_mime')
+      let mimeview = this.itm_disco('itm_find_mimeview')
       if mimeview ::
         return mimeview.get(mime)
 
@@ -13,30 +13,26 @@ export const itm_dynamic = @{}
 
   async wc_connect() ::
     let content = this.load_content()
-    this.render_loading(content)
-    await this.render_view(content)
+    this.render_loading(content, this)
+    await this.render_view(await content, this)
 
   wc_disconnect() ::
     this.wc.textContent = '' // clear body
 
-  async render_view(content) ::
+  render_loading(content, ctx) ::
+    let wc = this.wc
+    let msg = `loading ${wc.getAttribute('mime') || '??'} ${wc.getAttribute('k')}`
+    let el = this.imtiny('pre', {class: 'itm-loading'}, msg)
+    wc.append(el)
+
+  async render_view(content, ctx) ::
     let wc = this.wc
     let view_fn = this.view_for ?? this.find_mime()
-
     if view_fn?.then :: view_fn = await view_fn
-    if ! view_fn ::
-      console.warn('view_fn not found', wc.getAttribute('mime'))
-      return this.render_absent(content)
 
     if ! wc.signal.aborted ::
       let el = view_fn.call(this, content, this)
       if el?.then :: el = await el
       wc.textContent = ''
       wc.append(el)
-
-  async render_loading(content) ::
-    let wc=this.wc, el=wc.ownerDocument.createElement('div')
-    el.classList.add('itm-loading')
-    el.append(`${wc.getAttribute('mime') || '??'} ${wc.getAttribute('k')}`)
-    wc.append(el)
 

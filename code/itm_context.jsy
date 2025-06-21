@@ -1,7 +1,10 @@
+
 export const itm_base = @{}
   __proto__: null
 
   with(kw) :: return {__proto__: this, ...kw}
+  set(kw) :: return Object.assign(this, kw)
+
 
   itm_disco(evt, list, fn=Boolean) ::
     let detail = list ?? []
@@ -47,11 +50,29 @@ export const itm_base = @{}
       return module
 
 
+  imtiny(el, attr, ...z) ::
+    if ! el.nodeType :: el = this.wc.ownerDocument.createElement(el)
+    Object.assign(el, attr).append(...z)
+    return el
+
+  async view_pre_text(content) ::
+    content = await (await content)?.text()
+    return this.imtiny('pre', {class: 'itm-pre'}, ''+content)
+
 
 export const itm_root = @{}
   __proto__: itm_base
   base: itm_base
 
+  async mime_when(type, preconditions, view_for_mime) ::
+    this.mimeview.set.call // validate mimeview is available
+
+    for let c of [preconditions].flat(2) ::
+      if c?.trim :: c = customElements.whenDefined(c)
+      c = await c
+
+    this.mimeview.set(type, view_for_mime)
+    return true
 
 
 export const itm_context = @{}

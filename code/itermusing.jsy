@@ -6,8 +6,8 @@ import { kbc_itm_store, WhenMap } from './itm_store.jsy'
   C.define @ 'itm-root',
     class extends ItmRoot ::
       itm_pub = @{}
-        stg: this.hasAttribute('no-stg') ? null : kbc_itm_store(this)
-        mime: this.hasAttribute('no-mime') ? null : new WhenMap()
+        stg: this.hasAttribute('with-stg') ? kbc_itm_store(this) : null
+        mimeview: this.hasAttribute('with-mimeview') ? new WhenMap() : null
 
   C.define @ 'itm-m', class extends ItmModel {}
   C.define @ 'itm-v', class extends ItmView {}

@@ -1,22 +1,9 @@
-import {imm_html as h} from 'imm-dom'
-
-const _mock_views = @{}
-  async 'text/plain'(content) ::
-    content = await (await content)?.text()
-    if content ::
-      return h.pre(`${content}`)
-
-  async 'text/html'(content) ::
-    content = await (await content)?.text()
-    if content ::
-      return h.div @:
-        '=innerHTML': content
-
+async function mime_unsafe_html(content, ctx) ::
+  content = await (await content)?.text()
+  let el = ctx.imtiny('div', {})
+  el.innerHTML = content ?? ''
+  return el
 
 export async function itermuse(ctx) ::
-  console.group @ 'MOCK VIEWS'
-  for let [mime, view] of Object.entries(_mock_views) ::
-    ctx.mime.set(mime, view)
-    console.log @: mime, view
-  console.groupEnd()
+  ctx.mimeview.set('text/html', mime_unsafe_html)
 

@@ -37,6 +37,7 @@ npm run build
 ```
 
 ## Inspirations
+
 - Self-hosted nature of
     - [TiddlyWiki](https://tiddlywiki.com)
     - [Feather Wiki](https://feather.wiki)
@@ -53,7 +54,7 @@ npm run build
 
 
 - Diagraming and Whiteboarding tools
-    - [Excalidraw](https://excalidraw.com)
+    - [Excalidraw](https://excalidraw.com) & [GH: excalidraw/excalidraw](https://github.com/excalidraw/excalidraw)
     - [Draw.io / Diagrams.net](https://app.diagrams.net)
     - [Mermaid](https://mermaid.js.org)
     - [Miro](https://miro.com)
@@ -79,6 +80,32 @@ npm run build
     - [Trello](https://trello.com)
 
 
+- Structured data:
+    - [CBOR](https://cbor.io)
+    - [Schema.org](https://schema.org)
+    - JSON
+        - [JSON Schema](https://json-schema.org/understanding-json-schema/reference) and [draft-07](https://json-schema.org/draft-07)
+        - [quicktype](https://github.com/glideapps/quicktype) to generate types and converters from JSON, Schema, and GraphQL
+        - [JSON-LD](https://json-ld.org)
+        - [JSON Type Definition (JTD)](https://www.rfc-editor.org/rfc/rfc8927.html)
+        - [JSON Pointer](https://datatracker.ietf.org/doc/html/rfc6901)
+        - [JSON Patch](https://datatracker.ietf.org/doc/html/rfc6902/#section-3)
+        - [JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7396)
+
+- Single-Purpose tools
+    - Markdown: [zero-md](https://zerodevx.github.io/zero-md/) or [md-block](https://md-block.verou.me/)
+    - [MathJax](https://www.mathjax.org)
+    - [MathQuill](http://mathquill.com)
+    - [MathJS](https://mathjs.org/index.html)
+    - [ProseMirror](https://prosemirror.net)
+    - [CodeMirror](https://codemirror.net), Monaco, or ACE
+
+- CRDT
+    - [Y.js](https://yjs.dev) & [GH: yjs/yjs](https://github.com/yjs/yjs)
+    - [JSON Joy](https://jsonjoy.com) & [GH: streamich/json-joy](https://github.com/streamich/json-joy)
+    - [automerge](https://automerge.org) & [GH: automerge](https://github.com/automerge)
+
+
 - Coding Notebooks
     - [iPython / Jupyter Notebook](https://ipython.org/notebook.html)
     - [ObservableHQ](https://observablehq.com)
@@ -86,6 +113,7 @@ npm run build
     - [D3](https://github.com/d3/d3) sketches
     - [Plot](https://github.com/observablehq/plot)
     - [Vega](https://vega.github.io)
+    - [Math Notepad](https://mathnotepad.com)
 
 
 - [Explorable Explanations](https://en.wikipedia.org/wiki/Explorable_explanation)
@@ -102,6 +130,7 @@ npm run build
 - Handwriting digitization tools
     - image scanner
     - pictures of whiteboards
+    - [jscanify](https://colonelparrot.github.io/jscanify/) & [GH:jscanify](https://github.com/puffinsoft/jscanify/)
     - [RocketBook](https://getrocketbook.com)
     - [LiveScribe](https://us.livescribe.com)
     - [reMarkable](https://remarkable.com/)

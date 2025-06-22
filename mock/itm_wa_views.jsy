@@ -1,6 +1,6 @@
 async function mime_unsafe_html(content, ctx) ::
-  content = await (await content)?.text()
-  let el = ctx.imtiny('div', {})
+  content = await content?.text()
+  let el = document.createElement('div')
   el.innerHTML = content ?? ''
   return el
 

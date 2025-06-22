@@ -68,6 +68,24 @@ export const itm_base = @{}
 
 
   imtiny
+
+  use_cdn(opt, ...path_list) ::
+    if opt.trim ::
+      opt = {base_url: location, paths:[opt]}
+
+    let as_script = path => @
+      imtiny @ 'script', @{}
+        type: opt.type ?? 'module'
+        src: new URL(path, opt.base_url).href
+        crossorigin: 'anonymous'
+
+    if opt.paths :: path_list.push(... opt.paths)
+
+    let el_scripts = path_list.flat(9).map(as_script)
+    document.head.append(... el_scripts)
+    return el_scripts
+
+
   async view_pre_text(content) ::
     content = await (await content)?.text()
     return imtiny('pre', {class: 'itm-pre'}, ''+content)

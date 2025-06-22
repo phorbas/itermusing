@@ -1,3 +1,8 @@
+//////
+// Use CodeMirror if available
+//   from Marijn Haverbeke and contributors
+//   https://codemirror.net/
+
 export const editas_codemirror = opt => @
   opt = {'viewport-margin': Infinity, ... opt}
   (content, ctx) => ::
@@ -15,6 +20,9 @@ export const editas_codemirror = opt => @
     return el_wc
 
 
+//////
+// Itermuse setup hook
+
 export async function itermuse(ctx) ::
   ctx.mimeview_when @ 'wc-codemirror', @{}
     '#edit': editas_codemirror(),
@@ -26,6 +34,9 @@ export async function itermuse(ctx) ::
     'text/css#edit': editas_codemirror({mode:'css'}),
     'text/javascript#edit': editas_codemirror({mode:'javascript'}),
 
+
+//////
+// Itermuse initialization hook
 
 const import_params = new URL(import.meta.url).searchParams
 export async function init_itermuse(ctx) ::

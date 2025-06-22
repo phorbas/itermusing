@@ -73,6 +73,22 @@ export const itm_base = @{}
     return imtiny('pre', {class: 'itm-pre'}, ''+content)
 
 
+  doc_as_html(doc, opt) ::
+    doc ??= this.wc.ownerDocument
+    if 9 !== doc.nodeType :: throw new TypeError
+    let html = new Blob(
+      [`<!DOCTYPE ${doc.doctype.name}>\n${doc.documentElement.outerHTML}\n`]
+      , {type: 'text/html'})
+
+    if opt?.download ::
+      let href = URL.createObjectURL(html)
+      setTimeout(URL.revokeObjectURL, 500, href)
+
+      let el_a = this.imtiny('a', {download: opt.download, href}, ''+opt.download)
+      el_a.click()
+    return html
+
+
 export const itm_root = @{}
   __proto__: itm_base
   base: itm_base

@@ -4,9 +4,12 @@ import rpi_jsy from 'rollup-plugin-jsy'
 
 const entrypoints = [
   'code/itermusing.jsy',
+
   'code/itm_components.jsy',
   'code/itm_store.jsy',
+
   'code/mime_basic.js',
+  'code/mime_codemirror.jsy',
 ]
 const mock_entrypoints = [
   'mock/itm_wa_views.jsy',

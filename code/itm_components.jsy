@@ -46,10 +46,6 @@ export class ItmCore extends HTMLElement ::
       return true
     return false
 
-  itm_dbg() ::
-    console.log @ 'itm_root has stg?', this.ctx.itm_disco('itm_stg',[])
-    console.log @ 'itm_root has mime?', this.ctx.itm_disco('itm_mime',[])
-
 export {ItmCore as ItmModel}
 
 
@@ -77,8 +73,7 @@ export class ItmRoot extends ItmCore ::
 
     let el_tgt=this.parentNode
     for let [attr] of itm_pub ::
-      // itm_find_stg, itm_find_mime
-      console.log @ `itm_find_${attr}`
+      // itm_find_stg, itm_find_mimeview
       el_tgt.addEventListener @
         `itm_find_${attr}`
         evt => :: evt.detail.push(ctx[attr])

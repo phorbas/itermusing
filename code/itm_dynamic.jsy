@@ -20,18 +20,18 @@ export const itm_dynamic = @{}
     this.wc.textContent = '' // clear body
 
   render_loading(content, ctx) ::
-    let wc = this.wc
+    let wc = ctx.wc
     let msg = `loading ${wc.getAttribute('mime') || '??'} ${wc.getAttribute('k')}`
-    let el = this.imtiny('pre', {class: 'itm-loading'}, msg)
+    let el = ctx.imtiny('pre', {class: 'itm-loading'}, msg)
     wc.append(el)
 
   async render_view(content, ctx) ::
-    let wc = this.wc
-    let view_fn = this.view_for ?? this.find_mime()
+    let wc = ctx.wc
+    let view_fn = ctx.view_for ?? ctx.find_mime()
     if view_fn?.then :: view_fn = await view_fn
 
     if ! wc.signal.aborted ::
-      let el = view_fn.call(this, content, this)
+      let el = view_fn.call(ctx, content, ctx)
       if el?.then :: el = await el
       wc.textContent = ''
       wc.append(el)

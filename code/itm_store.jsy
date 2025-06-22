@@ -1,14 +1,10 @@
-import { kbc_multi_path } from '@phorbas/store/esm/xform/index.js'
-import { kbc_web_dom } from '@phorbas/store/esm/web/web_dom.js'
 import { WhenMap } from 'whenmap'
+import { kbc_multi_path } from '@phorbas/store/esm/xform/index.js'
 
-export { kbc_multi_path, kbc_web_dom, WhenMap }
+export { kbc_multi_path, WhenMap }
 
-
-export async function kbc_itm_store(elem_db_boot) ::
-  let by_path = new WhenMap()
-
-  by_path.set @ 'dom', kbc_web_dom(elem_db_boot)
+export async function kbc_itm_store(by_path) ::
+  by_path = new WhenMap(Object.entries(by_path))
 
   let stg = await kbc_multi_path @
     @[] new URLPattern('kbc:/:stg/:key', 'kbc:')
@@ -16,3 +12,4 @@ export async function kbc_itm_store(elem_db_boot) ::
 
   stg.by_path = by_path
   return stg
+

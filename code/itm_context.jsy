@@ -1,4 +1,14 @@
 
+// imm-dom inspired tiny DOM rendering utility
+function imtiny(el, attr, ...z) ::
+  if null != el ::
+    if ! el.nodeType :: el = document.createElement(el)
+    for let [k,v] of Object.entries(attr) ::
+      el.setAttribute(k, v)
+    el.append(...z.flat(9))
+  return el
+
+
 export const itm_base = @{}
   __proto__: null
 
@@ -21,7 +31,7 @@ export const itm_base = @{}
 
 
   async find_stg() ::
-    let stg = this.stg, wc=this.wc, signal=wc.signal
+    let stg = this.stg
     while ! stg ::
       stg = this.itm_disco('itm_find_stg')
       if stg :: return this.stg = stg
@@ -29,49 +39,57 @@ export const itm_base = @{}
       if ! await this.itm_disco_update() :: return
     return stg
 
-  async kbc_fetch(kbckey, mime) ::
-    kbckey = kbckey.pathname ?? kbckey
-    let stg = this.stg ?? await this.find_stg()
-
-    let ab = await stg.kbc_fetch(kbckey, {signal: this.wc.signal})
-    ab &&= new Blob([ab], {type: mime})
-    return ab
-
-
   async import_at(ref, opt) ::
     ref &&= new URL(ref, opt?.base_url ?? globalThis.location)
 
     if 'kbc:' === ref?.protocol ::
-      let blob = await this.kbc_fetch(ref.pathname, 'text/javascript')
-      ref = blob ? URL.createObjectURL(blob) : null
+      let stg = this.stg ?? await this.find_stg()
+      let ab = await this.stg.kbc_fetch(ref.pathname, {signal: this.wc.signal})
+      ref = !ab ? null : URL.createObjectURL @
+        new Blob([ab], {type: 'text/javascript'})
 
     if ref ::
       let module = await import(/* @vite-ignore */ ref, {... opt})
       return module
 
+  async fetch_content(ref, mime, fetch_opt) ::
+    ref &&= new URL(ref, 'kbc:')
 
-  imtiny(el, attr, ...z) ::
-    if ! el.nodeType :: el = this.wc.ownerDocument.createElement(el)
-    Object.assign(el, attr).append(...z)
-    return el
+    if 'kbc:' === ref?.protocol ::
+      let stg = this.stg ?? await this.find_stg()
+      let ab = await stg.kbc_fetch(ref.pathname)
+      ab &&= new Blob([ab], {type: mime})
+      return ab
 
+    if ref ::
+      let resp = await fetch @ ref,
+        @{} signal: this.wc.signal, ...fetch_opt
+      return await resp
+
+
+  imtiny
   async view_pre_text(content) ::
     content = await (await content)?.text()
-    return this.imtiny('pre', {class: 'itm-pre'}, ''+content)
+    return imtiny('pre', {class: 'itm-pre'}, ''+content)
 
 
 export const itm_root = @{}
   __proto__: itm_base
   base: itm_base
 
-  async mime_when(type, preconditions, view_for_mime) ::
-    this.mimeview.set.call // validate mimeview is available
+  async mimeview_when(preconditions, sub_mimeview) ::
+    sub_mimeview = sub_mimeview[Symbol.iterator]?.()
+      ?? Object.entries(sub_mimeview)
+
+    let mimeview = this.mimeview
+    mimeview.set.call // validate mimeview is available
 
     for let c of [preconditions].flat(2) ::
       if c?.trim :: c = customElements.whenDefined(c)
       c = await c
 
-    this.mimeview.set(type, view_for_mime)
+    for let [type, view] of sub_mimeview ::
+      mimeview.set(type, view)
     return true
 
 
@@ -83,14 +101,21 @@ export const itm_context = @{}
     return this.content ??= await this.fetch_content @
       this.wc.getAttribute('k'), this.wc.getAttribute('mime')
 
-  async fetch_content(ref, mime, fetch_opt) ::
-    ref &&= new URL(ref, 'kbc:')
+  async store_content(content) ::
+    let wc=this.wc, k=wc.getAttribute('k') ?? this.new_key()
+    content = await content
+    let stg = this.stg ?? await this.find_stg()
+    let err = await stg.kbc_store(k, content, {signal: wc.signal})
+    if err :: throw err
+    this.content = content
+    return {k}
 
-    if 'kbc:' === ref?.protocol ::
-      return await this.kbc_fetch(ref.pathname, mime)
+  new_key(prefix='kbc:/dom/') ::
+    let k = crypto.getRandomValues(new Uint32Array(4))
+      .reduce @
+        (s,v) => s+v.toString(16).padStart(8,'0')
+        prefix
 
-    if ref ::
-      let resp = await fetch @ ref,
-        @{} signal: this.wc.signal, ...fetch_opt
-      return await resp
+    this.wc.setAttribute('k', k)
+    return k
 

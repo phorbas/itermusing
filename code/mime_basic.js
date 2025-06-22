@@ -1,19 +1,20 @@
-
 export async function viewas_md_block(content, ctx) {
+  const h = ctx.imtiny
   content = await content?.text()
-  return ctx.imtiny('md-block', {}, ''+content)
+  return h('md-block', {}, ''+content)
 }
 
 export async function viewas_zero_md(content, ctx) {
+  const h = ctx.imtiny
   content = await content?.text()
-  return ctx.imtiny('zero-md', {},
-    ctx.imtiny('script', {type:'text/markdown'}, ''+content) )
+  return h('zero-md', {},
+    h('script', {type:'text/markdown'}, ''+content) )
 }
+
 
 export async function itermuse(ctx) {
   ctx.mimeview.set('text/plain', ctx.view_pre_text)
-  ctx.mimeview.set('text/html', ctx.view_pre_text)
 
-  ctx.mime_when('text/markdown', 'md-block', viewas_md_block)
-  ctx.mime_when('text/markdown', 'zero-md', viewas_zero_md)
+  ctx.mimeview_when('md-block', {'text/markdown': viewas_md_block})
+  ctx.mimeview_when('zero-md', {'text/markdown': viewas_zero_md})
 }

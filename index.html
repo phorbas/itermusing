@@ -34,21 +34,29 @@
   <script type=module crossorigin src="https://early.webawesome.com/webawesome@3.0.0-alpha.13/dist/webawesome.loader.js"></script>
   <script type=module src='/esm/itermusing.js?boot'></script>
 
-  <!--
   <script type=module src="https://cdn.jsdelivr.net/npm/zero-md@3/dist/index.min.js?register" crossorigin="anonymous"></script>
+  <!--
   <script type=module src="https://md-block.verou.me/md-block.js" crossorigin="anonymous"></script>
   -->
+
+  <!--
+  <script type=module src="https://cdn.jsdelivr.net/npm/@vanillawc/wc-monaco-editor@1.10.15/index.min.js" integrity="sha256-QbvTJewzsOSfw/gqDsU3txAnz3YylQydPfhPLnT/QVA=" crossorigin="anonymous"></script>
+  -->
+  <script type=module src="https://cdn.jsdelivr.net/npm/@vanillawc/wc-codemirror@2.1.0/index.min.js" crossorigin="anonymous"></script>
+  <script type=module src="https://cdn.jsdelivr.net/npm/@vanillawc/wc-codemirror@2.1.0/mode/javascript/javascript.js" crossorigin="anonymous"></script>
+  <script type=module src="https://cdn.jsdelivr.net/npm/@vanillawc/wc-codemirror@2.1.0/mode/html/html.js" crossorigin="anonymous"></script>
+  <script type=module src="https://cdn.jsdelivr.net/npm/@vanillawc/wc-codemirror@2.1.0/mode/markdown/markdown.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
 <itm-root with-stg with-mimeview
   init-mock='/esm-mock/mock_data.js'
   dep-mime='/esm/mime_basic.js'
-  dep-wa='/esm-mock/itm_wa_views.js'
+  dep-codemirror='/esm/mime_codemirror.js'
 ></itm-root>
 
 <main>
-  <h6>text/plain of HTML content</h6>
+  <h6>text/plain</h6>
   <itm-v mime='text/plain' k="kbc:/dom/5651c81876eb346c3cc3ad98795c85e509ba7e68d431c6e8092a9e4ddb2601bf"></itm-v>
 
   <h6>text/html</h6>
@@ -64,6 +72,8 @@
   <h6>Rendered text/markdown content</h6>
   <itm-v mime='text/markdown' k="kbc:/dom/6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26"></itm-v>
 
+  <itm-v mime='text/javascript#edit' k="kbc:/dom/0a667330f5fabd6117f913396db0536b3e3e707a624d31910f74b41cc31924c7"></itm-v>
+  <itm-v mime='text/markdown#edit'></itm-v>
   <!--
   <h6>Rendered md_block text/markdown content</h6>
   <itm-v mime='text/markdown' k="kbc:/dom/6578fe6b268df5aef0a1e9cea25c9dfe2ffe6cc463d040fe802e5ee3cc9cfa26"

@@ -1,0 +1,36 @@
+/*
+<script type=module src="https://cdn.jsdelivr.net/npm/@vanillawc/wc-codemirror@2.1.0/index.min.js" crossorigin="anonymous"></script>
+<script type=module src="https://cdn.jsdelivr.net/npm/@vanillawc/wc-codemirror@2.1.0/mode/javascript/javascript.js" crossorigin="anonymous"></script>
+<script type=module src="https://cdn.jsdelivr.net/npm/@vanillawc/wc-codemirror@2.1.0/mode/html/html.js" crossorigin="anonymous"></script>
+<script type=module src="https://cdn.jsdelivr.net/npm/@vanillawc/wc-codemirror@2.1.0/mode/markdown/markdown.js" crossorigin="anonymous"></script>
+*/
+
+export const editas_codemirror = opt => @
+  opt = {'viewport-margin': Infinity, ... opt}
+  (content, ctx) => ::
+    let el_wc = ctx.imtiny('wc-codemirror', {...opt})
+
+    ::!>
+      content = await content?.text()
+      el_wc.value = content ?? ''
+
+      el_wc.editor.on @ 'blur', @::>
+        let done = await ctx.store_content(el_wc.value)
+        console.log @ "Saved to %o", done
+
+
+    return el_wc
+
+
+export async function itermuse(ctx) ::
+  ctx.mimeview_when @ 'wc-codemirror', @{}
+    '#edit': editas_codemirror(),
+    '#edit:codemirror': editas_codemirror(),
+
+    'text/javascript': editas_codemirror({mode:'javascript'}),
+    'text/javascript#edit': editas_codemirror({mode:'javascript'}),
+
+    'text/html': editas_codemirror({mode:'html'}),
+    'text/html#edit': editas_codemirror({mode:'html'}),
+    'text/markdown#edit': editas_codemirror({mode:'markdown'}),
+

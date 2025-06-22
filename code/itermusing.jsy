@@ -1,14 +1,20 @@
 import { ItmModel, ItmView, ItmRoot } from './itm_components.jsy'
 import { kbc_itm_store, WhenMap } from './itm_store.jsy'
+import { kbc_web_dom } from '@phorbas/store/esm/web/web_dom.js'
 
 ::
   let C = customElements
+  C.define @ 'itm-m', class extends ItmModel {}
+  C.define @ 'itm-v', class extends ItmView {}
+
   C.define @ 'itm-root',
     class extends ItmRoot ::
       itm_pub = @{}
-        stg: this.hasAttribute('with-stg') ? kbc_itm_store(this) : null
-        mimeview: this.hasAttribute('with-mimeview') ? new WhenMap() : null
+        stg: this.hasAttribute('with-stg')
+          ? kbc_itm_store({'dom': kbc_web_dom(this)})
+          : null
 
-  C.define @ 'itm-m', class extends ItmModel {}
-  C.define @ 'itm-v', class extends ItmView {}
+        mimeview: this.hasAttribute('with-mimeview')
+          ? new WhenMap()
+          : null
 

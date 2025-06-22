@@ -1,11 +1,3 @@
-/*
-<script type=module src="https://cdn.jsdelivr.net/npm/@vanillawc/wc-codemirror@2.1.0/index.min.js" crossorigin="anonymous"></script>
-<script type=module src="https://cdn.jsdelivr.net/npm/@vanillawc/wc-codemirror@2.1.0/mode/markdown/markdown.js" crossorigin="anonymous"></script>
-<script type=module src="https://cdn.jsdelivr.net/npm/@vanillawc/wc-codemirror@2.1.0/mode/html/html.js" crossorigin="anonymous"></script>
-<script type=module src="https://cdn.jsdelivr.net/npm/@vanillawc/wc-codemirror@2.1.0/mode/css/css.js" crossorigin="anonymous"></script>
-<script type=module src="https://cdn.jsdelivr.net/npm/@vanillawc/wc-codemirror@2.1.0/mode/javascript/javascript.js" crossorigin="anonymous"></script>
-*/
-
 export const editas_codemirror = opt => @
   opt = {'viewport-margin': Infinity, ... opt}
   (content, ctx) => ::
@@ -30,7 +22,7 @@ export async function itermuse(ctx) ::
 
     'text/plain#edit': editas_codemirror({}),
     'text/markdown#edit': editas_codemirror({mode:'markdown'}),
-    'text/html#edit': editas_codemirror({mode:'html'}),
+    'text/html#edit': editas_codemirror({mode:'htmlmixed'}),
     'text/css#edit': editas_codemirror({mode:'css'}),
     'text/javascript#edit': editas_codemirror({mode:'javascript'}),
 
@@ -45,7 +37,7 @@ export async function init_itermuse(ctx) ::
   return true
 
 
-export function autoload_codemirror(ctx, version, mode_list=['markdown', 'html', 'css', 'javascript']) ::
+export function autoload_codemirror(ctx, version, mode_list=['markdown', 'htmlmixed', 'css', 'javascript']) ::
   return ctx.use_cdn({
     base_url: `https://cdn.jsdelivr.net/npm/@vanillawc/wc-codemirror@${version || '2'}/`,
     paths: [

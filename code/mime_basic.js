@@ -46,7 +46,9 @@ export async function itermuse(ctx) {
 // Itermuse initialization hook
 
 const import_params = new URL(import.meta.url).searchParams
-export async function init_itermuse(ctx) {
+export async function itermuse_init(ctx, make_import_dep) {
+  make_import_dep()
+
   let ver_md_block = import_params.get('md-block')
   if (null != ver_md_block)
     autoload_md_block(ctx, ver_md_block)
@@ -54,8 +56,5 @@ export async function init_itermuse(ctx) {
   let ver_zero_md = import_params.get('zero-md')
   if (null != ver_zero_md)
     autoload_zero_md(ctx, ver_zero_md)
-
-  await itermuse(ctx)
-  return true
 }
 

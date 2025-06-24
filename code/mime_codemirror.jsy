@@ -39,13 +39,12 @@ export async function itermuse(ctx) ::
 // Itermuse initialization hook
 
 const import_params = new URL(import.meta.url).searchParams
-export async function init_itermuse(ctx) ::
+export async function itermuse_init(ctx, make_import_dep) ::
+  make_import_dep()
+
   let include = import_params.get('include')
   if null != include ::
     autoload_codemirror(ctx, include)
-
-  await itermuse(ctx)
-  return true
 
 
 export function autoload_codemirror(ctx, version, mode_list=['markdown', 'htmlmixed', 'css', 'javascript']) ::

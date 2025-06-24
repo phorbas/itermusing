@@ -39,18 +39,33 @@ export const itm_base = @{}
       if ! await this.itm_disco_update() :: return
     return stg
 
+  async module_init(module, make_import_dep, init_url) ::
+    return await module.itermuse_init?.(this, make_import_dep, init_url)
+
+  async module_load(module) ::
+    return await module.itermuse?.(this)
+
   async import_at(ref, opt) ::
     ref &&= new URL(ref, opt?.base_url ?? globalThis.location)
 
     if 'kbc:' === ref?.protocol ::
-      let stg = this.stg ?? await this.find_stg()
-      let ab = await this.stg.kbc_fetch(ref.pathname, {signal: this.wc.signal})
-      ref = !ab ? null : URL.createObjectURL @
-        new Blob([ab], {type: 'text/javascript'})
+      return this.kbc_import(ref.pathname)
 
     if ref ::
-      let module = await import(/* @vite-ignore */ ref, {... opt})
-      return module
+      return await import(/* @vite-ignore */ ref, {... opt})
+
+  async kbc_import(key, opt) ::
+    let stg = this.stg ?? await this.find_stg()
+    let ab = await this.stg.kbc_fetch(key, {signal: this.wc.signal})
+    if ab ::
+      let kbc_url = URL.createObjectURL @
+        new Blob([ab], {type: 'text/javascript'})
+
+      try ::
+        return await import(/* @vite-ignore */ kbc_url, {... opt})
+      finally ::
+        URL.revokeObjectURL(kbc_url)
+
 
   async fetch_content(ref, mime, fetch_opt) ::
     ref &&= new URL(ref, 'kbc:')
@@ -141,15 +156,11 @@ export const itm_context = @{}
     let stg = this.stg ?? await this.find_stg()
     let err = await stg.kbc_store(k, content, {signal: wc.signal})
     if err :: throw err
-    this.content = content
     return {k}
 
   new_key(prefix='kbc:/dom/') ::
-    let k = crypto.getRandomValues(new Uint32Array(4))
-      .reduce @
-        (s,v) => s+v.toString(16).padStart(8,'0')
-        prefix
-
+    let k = crypto.getRandomValues(new Uint32Array(4)).reduce(_u32_hex, prefix)
     this.wc.setAttribute('k', k)
     return k
 
+const _u32_hex = (s,v) => s+v.toString(16).padStart(8,'0')

@@ -1,6 +1,9 @@
 import { itm_context, itm_root } from './itm_context.jsy'
 import { itm_dynamic } from './itm_dynamic.jsy'
 
+export * from './itm_context.jsy'
+export * from './itm_dynamic.jsy'
+
 
 export class ItmCore extends HTMLElement ::
   _ctx_ = itm_context
@@ -23,22 +26,12 @@ export class ItmCore extends HTMLElement ::
     return ctx
 
   async _itm_import_attrs(ctx) ::
-    for let [attr, import_url, as_dep_attr] of _itm_import_attrs(this) ::
-      ctx = await this._itm_import_at(ctx, attr, import_url, as_dep_attr)
-    return ctx
-
-  async _itm_import_at(ctx, attr, import_url, as_dep_attr) ::
-    let module = await ctx.import_at(import_url)
-    if module ::
-      let dep_url = as_dep_attr && await module.init_itermuse?.(ctx, import_url)
-      if dep_url ::
-        this.setAttribute @
-          as_dep_attr(attr)
-          true === dep_url
-            ? import_url.split(/[?#]/)[0]
-            : dep_url
-
-      ctx = await module.itermuse?.(ctx) ?? ctx
+    for let [url_frag, attr, make_import_dep] of _elem_import_attrs(this) ::
+      let module = await ctx.import_at(url_frag)
+      if module ::
+        if make_import_dep ::
+          ctx = await ctx.module_init(module, make_import_dep, url_frag) ?? ctx
+        ctx = await ctx.module_load(module) ?? ctx
     return ctx
 
   disconnectedCallback() ::
@@ -55,6 +48,12 @@ export class ItmCore extends HTMLElement ::
       pxy.replaceWith(this) // invoke connected
       return true
     return false
+
+  async itm_load_content(content) ::
+    return (await this.ctx).load_content()
+
+  async itm_store_content(content) ::
+    return (await this.ctx).store_content(content)
 
 export {ItmCore as ItmModel}
 
@@ -101,16 +100,30 @@ export class ItmRoot extends ItmCore ::
 // Import via element attributes
 
 const _rx_dep = /^dep(?:-\w+)?/, _rx_init = /^init(?:-\w+)?/
-const as_dep_attr = init_attr => init_attr.replace(/^init(-|$)/, 'dep$1')
-function * _itm_import_attrs(elem, test, test_init) ::
+function _elem_import_attrs(elem, test, test_init) ::
+  let res = []
   for let attr of elem.getAttributeNames() ::
     let init = _rx_init.test(attr)
     if init || _rx_dep.test(attr) ::
-      let val = elem.getAttribute(attr)
+      let url_frag = elem.getAttribute(attr)
 
-      if init ::
+      if ! init ::
+        res.push @# url_frag, attr
+
+      else ::
         elem.removeAttribute(attr)
-        yield [attr, val, as_dep_attr]
 
-      else yield [attr, val]
+        let make_import_dep = url =>
+          _make_import_dep(elem, attr, url_frag, url)
+
+        make_import_dep.init_url = url_frag
+
+        res.push @# url_frag, attr, make_import_dep
+
+  return res
+
+function _make_import_dep(elem, attr, init_url, url_frag) ::
+  url_frag ??= init_url.split(/[?#]/)[0]
+  attr = attr.replace(/^init(-|$)/, 'dep$1')
+  elem.setAttribute(attr, url_frag)
 

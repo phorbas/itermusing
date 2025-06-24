@@ -1,3 +1,37 @@
+import {imm_html as h, ImmElem} from 'imm-dom'
+
+class MockCreate extends ImmElem ::
+  render() ::
+    return h.form @:
+      $: @[]
+        h.label @ 'init-url',
+          h.input @: name:'init', value:''
+        h.label @ 'dep-url',
+          h.input @: name:'dep', value:''
+        h.label @ 'mime',
+          h.input @: name:'mime', value:'text/markdown#edit'
+        h.label @ 'content',
+          h.textarea @: name:'content'
+        h.button @ 'add itm-v'
+
+      async submit(evt) ::
+        evt.preventDefault()
+        let kv = new Map(new FormData(evt.target))
+        let content = kv.get('content') || '## What a _show_!'
+        kv.delete('content')
+
+        let attrs = Object.fromEntries @
+          [... kv].filter(e => e[1])
+
+        let el_itm = h.tag('itm-v', attrs)
+        await this.replaceWith(el_itm)
+
+        await el_itm.itm_store_content(content)
+        el_itm.itm_reload()
+
+MockCreate.dom('mock-create')
+
+
 async function mime_unsafe_html(content, ctx) ::
   content = await content?.text()
   let el = document.createElement('div')
